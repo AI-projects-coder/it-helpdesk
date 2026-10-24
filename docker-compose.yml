@@ -1,0 +1,18 @@
+# Local run:  docker compose up --build   ->  http://localhost:8080
+# CLI:        docker compose run --rm helpdesk query "How do I export my data?"
+# Smoke test: docker compose run --rm helpdesk smoke
+services:
+  helpdesk:
+    build: .
+    image: it-helpdesk:local
+    env_file: .env            # OPENAI_API_KEY etc.; never copied into the image
+    environment:
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - helpdesk-data:/var/lib/helpdesk   # KB index, sessions, traces, conversations, checkpoints
+    restart: unless-stopped
+
+volumes:
+  helpdesk-data:

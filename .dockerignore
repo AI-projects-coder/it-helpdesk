@@ -1,0 +1,28 @@
+# secrets and local environments
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+
+# VCS / tooling caches
+.git/
+.github/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.DS_Store
+
+# generated at runtime (lives in RUNTIME_DIR inside the container)
+data/chroma/
+data/sessions/
+data/traces/
+data/state/
+data/eval/*
+!data/eval/baseline.json
+
+# not needed at runtime
+tests/
+requirements-dev.txt
