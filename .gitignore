@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+data/chroma/
+data/sessions/*
+data/traces/*
+!data/sessions/.gitkeep
+!data/traces/.gitkeep
+.DS_Store
+# eval runs are reproducible; only the baseline is versioned (CI compares against it)
+data/eval/*
+!data/eval/baseline.json
+.ruff_cache/
+*.egg-info/

@@ -1,0 +1,24 @@
+[project]
+name = "helpdesk"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+
+[project.scripts]
+helpdesk = "helpdesk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-m 'not integration'"
+markers = ["integration: calls real external APIs (OpenAI); run with -m integration"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["UP046"]  # keep Generic[T]: clearer to most readers than PEP 695 syntax

@@ -1,0 +1,452 @@
+{
+  "CUST_05883": {
+    "customer_id": "CUST_05883",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_00501": {
+    "customer_id": "CUST_00501",
+    "segment": "individual",
+    "sla_plan": "gold",
+    "region": "LATAM",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": true
+  },
+  "CUST_02280": {
+    "customer_id": "CUST_02280",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "LATAM",
+    "platform": "desktop_app",
+    "account_status": "locked",
+    "mfa_enabled": false
+  },
+  "CUST_05791": {
+    "customer_id": "CUST_05791",
+    "segment": "enterprise",
+    "sla_plan": "platinum",
+    "region": "NA",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_01116": {
+    "customer_id": "CUST_01116",
+    "segment": "education",
+    "sla_plan": "platinum",
+    "region": "EU",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06902": {
+    "customer_id": "CUST_06902",
+    "segment": "small_business",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_07581": {
+    "customer_id": "CUST_07581",
+    "segment": "enterprise",
+    "sla_plan": "gold",
+    "region": "MEA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_04079": {
+    "customer_id": "CUST_04079",
+    "segment": "small_business",
+    "sla_plan": "gold",
+    "region": "APAC",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03123": {
+    "customer_id": "CUST_03123",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06485": {
+    "customer_id": "CUST_06485",
+    "segment": "small_business",
+    "sla_plan": "platinum",
+    "region": "MEA",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_08715": {
+    "customer_id": "CUST_08715",
+    "segment": "small_business",
+    "sla_plan": "standard",
+    "region": "NA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03540": {
+    "customer_id": "CUST_03540",
+    "segment": "enterprise",
+    "sla_plan": "gold",
+    "region": "NA",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_01042": {
+    "customer_id": "CUST_01042",
+    "segment": "education",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06955": {
+    "customer_id": "CUST_06955",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "APAC",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03084": {
+    "customer_id": "CUST_03084",
+    "segment": "non_profit",
+    "sla_plan": "gold",
+    "region": "LATAM",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_05412": {
+    "customer_id": "CUST_05412",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06456": {
+    "customer_id": "CUST_06456",
+    "segment": "education",
+    "sla_plan": "standard",
+    "region": "APAC",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03772": {
+    "customer_id": "CUST_03772",
+    "segment": "education",
+    "sla_plan": "standard",
+    "region": "LATAM",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_02508": {
+    "customer_id": "CUST_02508",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_01136": {
+    "customer_id": "CUST_01136",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "NA",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03325": {
+    "customer_id": "CUST_03325",
+    "segment": "individual",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_04264": {
+    "customer_id": "CUST_04264",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_07755": {
+    "customer_id": "CUST_07755",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "LATAM",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03868": {
+    "customer_id": "CUST_03868",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "APAC",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06539": {
+    "customer_id": "CUST_06539",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_07102": {
+    "customer_id": "CUST_07102",
+    "segment": "small_business",
+    "sla_plan": "standard",
+    "region": "NA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_05638": {
+    "customer_id": "CUST_05638",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06729": {
+    "customer_id": "CUST_06729",
+    "segment": "individual",
+    "sla_plan": "standard",
+    "region": "APAC",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_05765": {
+    "customer_id": "CUST_05765",
+    "segment": "individual",
+    "sla_plan": "gold",
+    "region": "APAC",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_04553": {
+    "customer_id": "CUST_04553",
+    "segment": "individual",
+    "sla_plan": "gold",
+    "region": "APAC",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_07541": {
+    "customer_id": "CUST_07541",
+    "segment": "education",
+    "sla_plan": "gold",
+    "region": "NA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_09617": {
+    "customer_id": "CUST_09617",
+    "segment": "education",
+    "sla_plan": "standard",
+    "region": "MEA",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_09578": {
+    "customer_id": "CUST_09578",
+    "segment": "individual",
+    "sla_plan": "platinum",
+    "region": "LATAM",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03732": {
+    "customer_id": "CUST_03732",
+    "segment": "small_business",
+    "sla_plan": "gold",
+    "region": "APAC",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_00196": {
+    "customer_id": "CUST_00196",
+    "segment": "individual",
+    "sla_plan": "standard",
+    "region": "LATAM",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_01009": {
+    "customer_id": "CUST_01009",
+    "segment": "education",
+    "sla_plan": "gold",
+    "region": "MEA",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_00731": {
+    "customer_id": "CUST_00731",
+    "segment": "education",
+    "sla_plan": "gold",
+    "region": "LATAM",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_04118": {
+    "customer_id": "CUST_04118",
+    "segment": "individual",
+    "sla_plan": "standard",
+    "region": "APAC",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06869": {
+    "customer_id": "CUST_06869",
+    "segment": "individual",
+    "sla_plan": "gold",
+    "region": "APAC",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06766": {
+    "customer_id": "CUST_06766",
+    "segment": "non_profit",
+    "sla_plan": "platinum",
+    "region": "MEA",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_09349": {
+    "customer_id": "CUST_09349",
+    "segment": "small_business",
+    "sla_plan": "standard",
+    "region": "NA",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_06058": {
+    "customer_id": "CUST_06058",
+    "segment": "education",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "web",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_09290": {
+    "customer_id": "CUST_09290",
+    "segment": "small_business",
+    "sla_plan": "standard",
+    "region": "NA",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_00218": {
+    "customer_id": "CUST_00218",
+    "segment": "small_business",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_07184": {
+    "customer_id": "CUST_07184",
+    "segment": "education",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "api_client",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_09761": {
+    "customer_id": "CUST_09761",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "LATAM",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_02769": {
+    "customer_id": "CUST_02769",
+    "segment": "education",
+    "sla_plan": "gold",
+    "region": "NA",
+    "platform": "ios",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_01016": {
+    "customer_id": "CUST_01016",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "LATAM",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_04341": {
+    "customer_id": "CUST_04341",
+    "segment": "enterprise",
+    "sla_plan": "standard",
+    "region": "NA",
+    "platform": "desktop_app",
+    "account_status": "active",
+    "mfa_enabled": false
+  },
+  "CUST_03792": {
+    "customer_id": "CUST_03792",
+    "segment": "non_profit",
+    "sla_plan": "standard",
+    "region": "EU",
+    "platform": "android",
+    "account_status": "active",
+    "mfa_enabled": false
+  }
+}

@@ -1,0 +1,40 @@
+# Policy as code. Evaluated before every tool call, in this order:
+#   1. unknown tool                       -> deny
+#   2. tool not in agent's allowed_tools  -> deny   (least privilege, see agents.yaml)
+#   3. tool not permitted for the role    -> deny
+#   4. rules below, first match wins
+#   5. no rule matched                    -> default_effect
+#
+# Rule conditions (all must match; a list means "any of"):
+#   tool, risk, role, approval_required, args_gt: {field: threshold}
+#   account_found: session fact; true/false from the account lookup, null if no lookup ran
+# Effects: allow | require_approval | deny
+version: "1.0.0"
+default_effect: deny
+
+role_permissions:
+  viewer: [search_kb]
+  user: [search_kb, get_account_status, create_ticket, reset_credentials,
+         update_security_settings, issue_refund]
+  admin: ["*"]
+
+rules:
+  - id: account-must-exist
+    description: Account-changing actions need an account lookup that found the customer.
+    when: {tool: [reset_credentials, update_security_settings, issue_refund], account_found: [false, null]}
+    effect: deny
+
+  - id: refund-limit
+    description: Automated refunds above 500 are never allowed, even with approval.
+    when: {tool: issue_refund, args_gt: {amount: 500}}
+    effect: deny
+
+  - id: approval-required-tools
+    description: Tools flagged approval_required in the registry need a human (HITL).
+    when: {approval_required: true}
+    effect: require_approval
+
+  - id: allow-low-medium-risk
+    description: Read-only and low-impact tools run without approval.
+    when: {risk: [low, medium]}
+    effect: allow

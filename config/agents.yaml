@@ -1,0 +1,39 @@
+# AI registry: catalog of agents for discoverability.
+# allowed_tools enforces least privilege; the policy engine denies any other tool.
+version: "1.0.0"
+agents:
+  - name: planner
+    version: "1.0.0"
+    description: Classifies the request's intent and plans which agents to run.
+    capabilities: [intent_classification, planning]
+    allowed_tools: []
+
+  - name: knowledge_search
+    version: "1.0.0"
+    description: Retrieves relevant resolution articles from the knowledge base.
+    capabilities: [semantic_search, keyword_search]
+    allowed_tools: [search_kb]
+
+  - name: access_check
+    version: "1.0.0"
+    description: Checks account status, SLA plan, and MFA state for the customer.
+    capabilities: [account_lookup, sla_lookup]
+    allowed_tools: [get_account_status]
+
+  - name: reasoning
+    version: "1.0.0"
+    description: Drafts the resolution and proposes the next action from tool results.
+    capabilities: [resolution_drafting, action_planning]
+    allowed_tools: []
+
+  - name: reflection
+    version: "1.0.0"
+    description: Checks that the draft resolution is grounded in tool results.
+    capabilities: [groundedness_check]
+    allowed_tools: []
+
+  - name: action_ticket
+    version: "1.0.0"
+    description: Executes the approved action or creates a follow-up ticket.
+    capabilities: [ticket_creation, account_actions]
+    allowed_tools: [create_ticket, reset_credentials, update_security_settings, issue_refund]

@@ -1,0 +1,141 @@
+[
+  {
+    "article_id": "KB_ACCOUNT_ACCESS",
+    "issue_type": "account_access",
+    "title": "Account access and login problems",
+    "applies_when": "user cannot log in, password rejected, account locked out, or two-factor (2FA) codes not working.",
+    "resolution": "Reset account credentials and confirmed successful login.",
+    "keywords": [
+      "login",
+      "log",
+      "password",
+      "locked",
+      "2fa",
+      "two",
+      "factor",
+      "code",
+      "access",
+      "sign"
+    ]
+  },
+  {
+    "article_id": "KB_BILLING_PROBLEM",
+    "issue_type": "billing_problem",
+    "title": "Billing and invoice problems",
+    "applies_when": "user was charged incorrectly or twice, invoice is wrong, or a plan change was billed incorrectly.",
+    "resolution": "Adjusted the invoice and issued a refund where applicable.",
+    "keywords": [
+      "charged",
+      "charge",
+      "twice",
+      "invoice",
+      "refund",
+      "billing",
+      "payment",
+      "downgrade",
+      "plan"
+    ]
+  },
+  {
+    "article_id": "KB_BUG",
+    "issue_type": "bug",
+    "title": "Product bugs",
+    "applies_when": "the product shows an error, crashes, or fails to save changes.",
+    "resolution": "Patched the bug and deployed a fix to production.",
+    "keywords": [
+      "error",
+      "crash",
+      "crashes",
+      "bug",
+      "broken",
+      "saving",
+      "save",
+      "fails",
+      "failing"
+    ]
+  },
+  {
+    "article_id": "KB_FEATURE_REQUEST",
+    "issue_type": "feature_request",
+    "title": "Feature requests",
+    "applies_when": "user asks for a new capability, more customization, or support for something not yet available.",
+    "resolution": "Captured the request and added it to the product backlog.",
+    "keywords": [
+      "feature",
+      "request",
+      "would",
+      "like",
+      "wish",
+      "add",
+      "support",
+      "customize",
+      "advanced"
+    ]
+  },
+  {
+    "article_id": "KB_HOW_TO",
+    "issue_type": "how_to",
+    "title": "How-to and configuration questions",
+    "applies_when": "user asks how to set up, configure, or export something and needs instructions.",
+    "resolution": "Provided step-by-step instructions and relevant documentation.",
+    "keywords": [
+      "how",
+      "configure",
+      "setup",
+      "set",
+      "export",
+      "instructions",
+      "steps",
+      "guide"
+    ]
+  },
+  {
+    "article_id": "KB_OTHER",
+    "issue_type": "other",
+    "title": "General questions",
+    "applies_when": "general account or workspace questions that don't fit another category.",
+    "resolution": "Provided general guidance and confirmed the issue was resolved.",
+    "keywords": [
+      "general",
+      "question",
+      "workspace",
+      "unsure",
+      "check",
+      "account"
+    ]
+  },
+  {
+    "article_id": "KB_PERFORMANCE",
+    "issue_type": "performance",
+    "title": "Performance degradation",
+    "applies_when": "the product or API is slow, requests time out, or performance is degraded.",
+    "resolution": "Optimized queries and increased resource allocation.",
+    "keywords": [
+      "slow",
+      "timeout",
+      "timing",
+      "latency",
+      "performance",
+      "degraded",
+      "lag",
+      "loading"
+    ]
+  },
+  {
+    "article_id": "KB_SECURITY_CONCERN",
+    "issue_type": "security_concern",
+    "title": "Security concerns",
+    "applies_when": "suspicious login activity, unrecognized devices, a possible vulnerability, or a security compliance question.",
+    "resolution": "Investigated logs, mitigated the issue, and updated security settings.",
+    "keywords": [
+      "suspicious",
+      "security",
+      "vulnerability",
+      "compliance",
+      "unauthorized",
+      "breach",
+      "unknown",
+      "device"
+    ]
+  }
+]

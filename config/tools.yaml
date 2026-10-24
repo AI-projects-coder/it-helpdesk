@@ -1,0 +1,65 @@
+# Tool registry. Every tool the agents can call is declared here.
+# handler:       "module:function" taking the input model, returning the output model
+# input/output:  Pydantic model names in helpdesk.tools.schemas
+# risk:          low | medium | high  (used by policy rules)
+version: "1.0.0"
+tools:
+  - name: search_kb
+    version: "1.0.0"
+    description: Hybrid semantic + keyword search over knowledge base resolution articles.
+    handler: helpdesk.tools.kb:search_kb
+    input_schema: SearchKBInput
+    output_schema: SearchKBOutput
+    risk: low
+    approval_required: false
+    timeout_s: 15
+
+  - name: get_account_status
+    version: "1.0.0"
+    description: Look up mock account status, SLA plan, and MFA state for a customer.
+    handler: helpdesk.tools.account:get_account_status
+    input_schema: AccountStatusInput
+    output_schema: AccountStatusOutput
+    risk: low
+    approval_required: false
+    timeout_s: 5
+
+  - name: create_ticket
+    version: "1.0.0"
+    description: Create a mock support ticket for follow-up by the support team.
+    handler: helpdesk.tools.actions:create_ticket
+    input_schema: CreateTicketInput
+    output_schema: CreateTicketOutput
+    risk: medium
+    approval_required: false
+    timeout_s: 5
+
+  - name: reset_credentials
+    version: "1.0.0"
+    description: Reset a customer's credentials and unlock the account (access grant).
+    handler: helpdesk.tools.actions:reset_credentials
+    input_schema: ResetCredentialsInput
+    output_schema: ActionOutput
+    risk: high
+    approval_required: true
+    timeout_s: 5
+
+  - name: update_security_settings
+    version: "1.0.0"
+    description: Apply security changes (revoke sessions, force MFA, rotate keys) to an account.
+    handler: helpdesk.tools.actions:update_security_settings
+    input_schema: SecurityUpdateInput
+    output_schema: ActionOutput
+    risk: high
+    approval_required: true
+    timeout_s: 5
+
+  - name: issue_refund
+    version: "1.0.0"
+    description: Issue a refund or invoice adjustment to a customer.
+    handler: helpdesk.tools.actions:issue_refund
+    input_schema: RefundInput
+    output_schema: ActionOutput
+    risk: high
+    approval_required: true
+    timeout_s: 5

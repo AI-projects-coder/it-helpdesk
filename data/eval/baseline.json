@@ -1,0 +1,2211 @@
+{
+  "run_id": "20261024T090358Z",
+  "started_at": "2026-10-24T09:03:58.969545+00:00",
+  "config": {
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini",
+    "judge_model": "gpt-4o-mini",
+    "embedding_model": "text-embedding-3-small",
+    "kb_top_k": 3,
+    "judge_prompt_version": "1.1"
+  },
+  "summary": {
+    "tickets": 50,
+    "correctness": 1.0,
+    "groundedness": 0.95,
+    "tool_use": 0.98,
+    "classification": 1.0,
+    "resolution_match": 1.0,
+    "latency_p50_ms": 4314.8,
+    "latency_p95_ms": 7824.1,
+    "tokens_avg": 1940.6,
+    "error_rate": 0.0,
+    "hitl_rate": 0.06,
+    "outcomes": {
+      "action_completed": 3,
+      "escalated": 8,
+      "ticket_created": 28,
+      "resolved": 11
+    },
+    "correctness_by_issue_type": {
+      "account_access": 1.0,
+      "billing_problem": 1.0,
+      "bug": 1.0,
+      "feature_request": 1.0,
+      "how_to": 1.0,
+      "other": 1.0,
+      "performance": 1.0,
+      "security_concern": 1.0
+    }
+  },
+  "tickets": [
+    {
+      "ticket_id": "TCKT_025902",
+      "session_id": "98e7a5fb4912",
+      "trace_id": "9e80181047b2c2388ecf0f78ebb04ff4",
+      "issue_type": "account_access",
+      "predicted_issue_type": "account_access",
+      "reference": "Reset account credentials and confirmed successful login.",
+      "resolution": "Reset account credentials and confirmed successful login.",
+      "action": "reset_credentials",
+      "outcome": "action_completed",
+      "hitl": true,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "human_approval",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "reset_credentials:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4656.9,
+      "tokens": 1758,
+      "llm_calls": 3,
+      "spans": 19,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly, as both involve resetting account credentials and confirming a successful login.",
+        "groundedness": "The agent's reply is fully supported by the user's request and the tool results. The user reported an incorrect password issue, and the agent correctly initiated a credentials reset, which is confirmed by the tool results stating that the credentials were reset and a reset link was sent.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_073667",
+      "session_id": "71b13400798a",
+      "trace_id": "c8aea7985c174ac51a7b93ddf526f5a9",
+      "issue_type": "account_access",
+      "predicted_issue_type": "account_access",
+      "reference": "Reset account credentials and confirmed successful login.",
+      "resolution": "Reset account credentials and confirmed successful login.",
+      "action": "reset_credentials",
+      "outcome": "action_completed",
+      "hitl": true,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "human_approval",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "reset_credentials:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4816.8,
+      "tokens": 1801,
+      "llm_calls": 3,
+      "spans": 19,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly, as both involve resetting account credentials and confirming successful login.",
+        "groundedness": "The agent's reply is fully supported by the evidence. The user reported an issue with their 2FA code, and the agent correctly identified that resetting the account credentials would help resolve the issue. The action of resetting the credentials was completed, and the agent provided the necessary information about the reset and the next steps.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_046462",
+      "session_id": "39cb6b4df0c9",
+      "trace_id": "fbdeb22ab6d558f7237359a5394c4cd9",
+      "issue_type": "account_access",
+      "predicted_issue_type": "account_access",
+      "reference": "Reset account credentials and confirmed successful login.",
+      "resolution": "The account credentials were reset to resolve the login issue.",
+      "action": "reset_credentials",
+      "outcome": "action_completed",
+      "hitl": true,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "human_approval",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "reset_credentials:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7617.7,
+      "tokens": 3045,
+      "llm_calls": 5,
+      "spans": 23,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involved resetting the account credentials, which aligns with the reference resolution of resetting account credentials and confirming successful login.",
+        "groundedness": "The agent's reply is fully supported by the evidence. The user's account was confirmed to be locked after multiple failed login attempts, and the agent correctly stated that they would reset the credentials. The tool results confirm that the credentials were reset and the account was unlocked, with a reset link sent to the user.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_072298",
+      "session_id": "06772ca282ed",
+      "trace_id": "fb0c0486942dca13902e4aa652b76230",
+      "issue_type": "billing_problem",
+      "predicted_issue_type": "billing_problem",
+      "reference": "Adjusted the invoice and issued a refund where applicable.",
+      "resolution": "Adjusted the invoice and issued a refund where applicable.",
+      "action": "issue_refund",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 5263.6,
+      "tokens": 1759,
+      "llm_calls": 3,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly, as both involve adjusting the invoice and issuing a refund for the duplicate charge.",
+        "groundedness": "The agent's reply is fully supported by the user's request about being charged twice and the tool results indicating a billing problem. The agent correctly initiated a ticket for the billing team to address the issue, which aligns with the resolution provided in the knowledge base article about billing problems.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_082586",
+      "session_id": "3fc03870cec2",
+      "trace_id": "2eccbbf0aa8894d481ce9c97d18c6218",
+      "issue_type": "billing_problem",
+      "predicted_issue_type": "billing_problem",
+      "reference": "Adjusted the invoice and issued a refund where applicable.",
+      "resolution": "Adjusted the invoice and issued a refund where applicable.",
+      "action": "issue_refund",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 5261.8,
+      "tokens": 1773,
+      "llm_calls": 3,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution by adjusting the invoice and issuing a refund, and they also created a ticket for further investigation, which aligns with the need for engineering support.",
+        "groundedness": "The agent's reply is fully supported by the user's request and the tool results. The user reported a billing issue after downgrading their plan, and the agent created a ticket for the billing team to investigate, which aligns with the knowledge base article on billing problems. The ticket creation is also confirmed in the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_094279",
+      "session_id": "d3103cfb0685",
+      "trace_id": "955603e9e9f1a8700bc8670dc93a8dc1",
+      "issue_type": "billing_problem",
+      "predicted_issue_type": "billing_problem",
+      "reference": "Adjusted the invoice and issued a refund where applicable.",
+      "resolution": "Adjusted the invoice and issued a refund where applicable.",
+      "action": "issue_refund",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4649.6,
+      "tokens": 1760,
+      "llm_calls": 3,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 0.5,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly, as both involve adjusting the invoice and issuing a refund.",
+        "groundedness": "The agent's reply mentions issuing a refund and escalating the ticket, which aligns with the knowledge base article about billing problems. However, the agent does not provide specific details about the invoice discrepancy or how it relates to the user's selected plan, which leaves some claims unsupported.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_009458",
+      "session_id": "67fb1197350a",
+      "trace_id": "a5563dcd5ae85673c3bb36a60af47f4f",
+      "issue_type": "security_concern",
+      "predicted_issue_type": "security_concern",
+      "reference": "Investigated logs, mitigated the issue, and updated security settings.",
+      "resolution": "Investigated logs, mitigated the issue, and updated security settings.",
+      "action": "update_security_settings",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7845.1,
+      "tokens": 3144,
+      "llm_calls": 5,
+      "spans": 19,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution in terms of investigating logs, mitigating the issue, and updating security settings. Additionally, the agent escalated the request to a human support engineer, which aligns with the need for further action.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding a suspicious login and the tool results indicating that the investigation will involve reviewing logs and updating security settings. The creation of a ticket for escalation is also supported by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_070355",
+      "session_id": "720505de439a",
+      "trace_id": "171975ad9dd74493577e6bbdf2efe7ae",
+      "issue_type": "security_concern",
+      "predicted_issue_type": "security_concern",
+      "reference": "Investigated logs, mitigated the issue, and updated security settings.",
+      "resolution": "Investigated logs, mitigated the issue, and updated security settings.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3957.6,
+      "tokens": 1664,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 0.5,
+        "tool_use": 0.5,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution in terms of investigating logs and mitigating the issue. Additionally, the agent correctly created a ticket for the engineering team to provide further details, which aligns with the reference's intent to address the inquiry about data encryption and compliance.",
+        "groundedness": "The agent acknowledges the user's request and creates a ticket for further investigation, but does not provide any specific details about data encryption or compliance, which is the main focus of the user's inquiry.",
+        "tool_use": "missing account lookup"
+      }
+    },
+    {
+      "ticket_id": "TCKT_004157",
+      "session_id": "ae549a864d9e",
+      "trace_id": "fda190c3deba22215aa7111338dd1e32",
+      "issue_type": "security_concern",
+      "predicted_issue_type": "security_concern",
+      "reference": "Investigated logs, mitigated the issue, and updated security settings.",
+      "resolution": "Investigated logs, mitigated the issue, and updated security settings.",
+      "action": "update_security_settings",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7638.7,
+      "tokens": 3202,
+      "llm_calls": 5,
+      "spans": 19,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 0.5,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution in terms of investigating logs, mitigating the issue, and updating security settings. Additionally, the agent escalated the request to a human support engineer, which aligns with the need for further action on the vulnerability.",
+        "groundedness": "The agent's claim about updating security settings is supported by the knowledge base article on security concerns, which mentions that security settings were updated in response to a vulnerability. However, the specific details of the vulnerability in the login authentication functionality were not directly addressed in the knowledge base results, leading to a minor unsupported detail.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_091014",
+      "session_id": "d37cc1c00c86",
+      "trace_id": "b0afac88e0046541caffc69375194c1d",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "Patched the bug and deployed a fix to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4376.0,
+      "tokens": 1634,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the error message, which aligns with the reference resolution of patching the bug and deploying a fix. Both resolutions address the same issue and involve routing the problem to engineering for resolution.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding the error message on the analytics dashboard and the action taken to create a ticket for further investigation. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_027612",
+      "session_id": "204b16f722a6",
+      "trace_id": "57b162f012c1cf34ce66006a816e32e7",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "The bug was patched and a fix was deployed to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4195.8,
+      "tokens": 1632,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the issue, which aligns with the reference resolution of patching the bug and deploying a fix. Both resolutions indicate that the issue will be addressed by the engineering team.",
+        "groundedness": "The agent's reply is fully supported by the user's request and the action taken (creating a ticket) in response to the issue reported. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_089152",
+      "session_id": "b5001988ca0f",
+      "trace_id": "4e5c127b4fe1296eb303f9aa7aee3ad0",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "The bug was patched and a fix was deployed to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4322.5,
+      "tokens": 1648,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the issue, which aligns with the reference resolution of patching the bug and deploying a fix. Both resolutions indicate that the issue will be addressed by engineering, thus they are equivalent in handling.",
+        "groundedness": "The agent's reply is fully supported by the user's request about the data export section crashing and the action taken to create a ticket for investigation. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_084745",
+      "session_id": "5b966b3c1d38",
+      "trace_id": "5ef2c073a58de55b345b602ad97c4618",
+      "issue_type": "performance",
+      "predicted_issue_type": "performance",
+      "reference": "Optimized queries and increased resource allocation.",
+      "resolution": "Optimized queries and increased resource allocation.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7373.0,
+      "tokens": 2829,
+      "llm_calls": 5,
+      "spans": 18,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution by creating a ticket for the engineering team to optimize queries and increase resource allocation, which is the same handling as described in the reference.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding the API integration module timing out and the tool results indicating performance degradation as a relevant issue. The creation of a ticket for the engineering team aligns with the need to investigate the performance issues.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_099852",
+      "session_id": "d6627818dd72",
+      "trace_id": "dee2522e97a2c221d25fa56403158895",
+      "issue_type": "performance",
+      "predicted_issue_type": "performance",
+      "reference": "Optimized queries and increased resource allocation.",
+      "resolution": "Optimized queries and increased resource allocation.",
+      "action": "create_ticket",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7191.8,
+      "tokens": 2918,
+      "llm_calls": 5,
+      "spans": 17,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution by creating a ticket for the engineering team to investigate and implement the same fixes (optimizing queries and increasing resource allocation).",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding the slow loading of the billing page and the tool results indicating performance degradation issues. The agent correctly mentions creating a ticket for the engineering team to investigate and optimize queries and resource allocation, which aligns with the knowledge base article on performance.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_082997",
+      "session_id": "ba590d23d5c6",
+      "trace_id": "189805e6ac6de1e1cddd9d5d87cff83e",
+      "issue_type": "performance",
+      "predicted_issue_type": "performance",
+      "reference": "Optimized queries and increased resource allocation.",
+      "resolution": "Optimized queries and increased resource allocation.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3992.2,
+      "tokens": 1619,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution in terms of the actions taken (optimizing queries and increasing resource allocation) and appropriately creates a ticket for engineering to handle the implementation.",
+        "groundedness": "The agent's response is fully supported by the user's request regarding performance degradation and the action taken to create a ticket for further investigation. The ticket creation is directly related to the reported issue, and the agent's acknowledgment of the user's concern aligns with the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_003683",
+      "session_id": "799bed2a0f35",
+      "trace_id": "44cc2d917ae00f0caa2cfcceb1deef6f",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4221.1,
+      "tokens": 1619,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which matches the reference resolution.",
+        "groundedness": "The agent's reply is fully supported by the tool results, specifically referencing the knowledge base article that provides step-by-step instructions for configuring the analytics dashboard.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_022192",
+      "session_id": "9c4e49bcb1ea",
+      "trace_id": "02717f637691be439bffccbe86e40eac",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7314.5,
+      "tokens": 2877,
+      "llm_calls": 5,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which matches the reference resolution.",
+        "groundedness": "The agent's reply is fully supported by the tool results, specifically referencing the step-by-step instructions available in the knowledge base for exporting data.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_069597",
+      "session_id": "1055a4ea08a0",
+      "trace_id": "d0f0e2441a1b50fbd1c3642c65d8c9c3",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4543.0,
+      "tokens": 1624,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided the same type of resolution as the reference by offering step-by-step instructions and relevant documentation for setting up API integration.",
+        "groundedness": "The agent's reply directly addresses the user's request for help with API integration by stating they will provide step-by-step instructions and relevant documentation, which is supported by the knowledge base article found in the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_009393",
+      "session_id": "c0fcfc25ea65",
+      "trace_id": "d2859acb47a5700b12a4a6ea08468478",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4158.5,
+      "tokens": 1632,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request to customize notifications and is fully supported by the tool results, which confirm that the request has been captured and added to the product backlog.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_041546",
+      "session_id": "2059ea591744",
+      "trace_id": "737ffe1ef750041e9e0f6dca4d29ce00",
+      "issue_type": "other",
+      "predicted_issue_type": "other",
+      "reference": "Provided general guidance and confirmed the issue was resolved.",
+      "resolution": "Provided general guidance and confirmed the issue was resolved.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7303.1,
+      "tokens": 2858,
+      "llm_calls": 5,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 0.5,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly in terms of the actions taken and the outcome achieved.",
+        "groundedness": "The agent claims to have provided general guidance, which aligns with the knowledge base article on general questions. However, the agent does not specify what guidance was provided or how it relates to the user's uncertainty about the category of their request, leaving some details unsupported.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_009178",
+      "session_id": "dea9332611df",
+      "trace_id": "6b65924a1b2e80894cc2395ff75d102f",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3850.7,
+      "tokens": 1594,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which matches the reference resolution.",
+        "groundedness": "The agent's reply directly references the tool results, specifically the knowledge base article that provides step-by-step instructions and relevant documentation for configuring API integration. There are no unsupported claims in the response.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_033258",
+      "session_id": "10550821c5a9",
+      "trace_id": "1baa5177438bffa1f70be19da76b1696",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3746.1,
+      "tokens": 1602,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which matches the reference resolution.",
+        "groundedness": "The agent's reply is fully supported by the tool results, specifically referencing the knowledge base article that provides step-by-step instructions for configuring billing.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_099937",
+      "session_id": "7fa661d56da1",
+      "trace_id": "1a17841cdc6d736866767eeb0caa0db4",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 8250.7,
+      "tokens": 2975,
+      "llm_calls": 5,
+      "spans": 17,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which matches the reference resolution.",
+        "groundedness": "The agent's reply is fully supported by the user's request for data export instructions and the tool results indicating that step-by-step instructions are available in the knowledge base.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_052663",
+      "session_id": "462f2c551f55",
+      "trace_id": "7d1f74d53c8d7a43027f4df190bd3118",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4637.4,
+      "tokens": 1619,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which matches the reference resolution.",
+        "groundedness": "The agent's reply directly addresses the user's request for exporting data from the mobile app section by stating that they will provide step-by-step instructions and referring to the documentation, which aligns with the knowledge base article on how-to and configuration questions.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_058301",
+      "session_id": "c433d5031644",
+      "trace_id": "6601b13ebfa67cadcb85fdaaf979b4cb",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 7824.1,
+      "tokens": 2892,
+      "llm_calls": 5,
+      "spans": 18,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 0.5,
+        "tool_use": 0.5,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided step-by-step instructions and relevant documentation, which aligns with the reference resolution. Additionally, the agent created a ticket for further assistance, which is appropriate given their role.",
+        "groundedness": "The agent's response indicates that a ticket has been created for further assistance, which is appropriate. However, the agent does not provide any immediate instructions or information on how to export data from the notifications section, which is the user's original request. This results in minor unsupported details.",
+        "tool_use": "action create_ticket not in ['none']"
+      }
+    },
+    {
+      "ticket_id": "TCKT_074841",
+      "session_id": "a42ac8458340",
+      "trace_id": "ebd9209505db93110c25814c60fa1ddf",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4021.3,
+      "tokens": 1648,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided the same type of resolution as the reference by offering step-by-step instructions and relevant documentation to assist the user in setting up the analytics dashboard.",
+        "groundedness": "The agent's reply directly references the tool results, specifically the knowledge base article that provides step-by-step instructions and relevant documentation for setting up the analytics dashboard. There are no unsupported claims in the response.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_026234",
+      "session_id": "c7aff6553098",
+      "trace_id": "06c80c5aa3e15949f203096413f625bf",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3948.8,
+      "tokens": 1621,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided the same type of resolution as the reference by offering step-by-step instructions and relevant documentation.",
+        "groundedness": "The agent's reply directly addresses the user's request for help with setting up data export by stating they will provide step-by-step instructions and relevant documentation, which is supported by the tool results indicating that such instructions are available.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_006880",
+      "session_id": "f04bec825d2d",
+      "trace_id": "dff6c93fafe277b181150e0f6c8dbe90",
+      "issue_type": "how_to",
+      "predicted_issue_type": "how_to",
+      "reference": "Provided step-by-step instructions and relevant documentation.",
+      "resolution": "Provided step-by-step instructions and relevant documentation.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4064.4,
+      "tokens": 1630,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent provided the same type of resolution as the reference by offering step-by-step instructions and relevant documentation.",
+        "groundedness": "The agent's reply is fully supported by the tool results, specifically referencing the 'How-to and configuration questions' article which indicates that step-by-step instructions and relevant documentation will be provided.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_023282",
+      "session_id": "57563681c44f",
+      "trace_id": "548087a23804581ab924cc8969421169",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "Patched the bug and deployed a fix to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4097.0,
+      "tokens": 1638,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the error message, which aligns with the reference resolution of patching the bug and deploying a fix. The agent's action captures the essence of routing the issue to engineering, which is the same resolution.",
+        "groundedness": "The agent's reply is fully supported by the user's request and the tool results. The user reported an error message in the mobile app, and the agent appropriately created a ticket for the engineering team to investigate this issue. The ticket creation is confirmed with the ticket ID provided.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_040845",
+      "session_id": "4dca7bf5c12d",
+      "trace_id": "8cade88cbd12e7a117608be74e466a2b",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "Patched the bug and deployed a fix to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4230.3,
+      "tokens": 1643,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the error message, which aligns with the reference resolution of patching the bug and deploying a fix. Both resolutions address the same issue and involve routing it to engineering for further action.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding the error message and the action taken to create a ticket for further investigation. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_029140",
+      "session_id": "e0a9014b9e7e",
+      "trace_id": "82801c2dc4f0564e05ea59a3b449cf04",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "The bug was patched and a fix was deployed to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4240.7,
+      "tokens": 1643,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the issue, which aligns with the reference resolution of patching the bug and deploying a fix. The agent's action captures the essence of routing the issue to engineering for resolution.",
+        "groundedness": "The agent's reply directly addresses the user's request about the billing feature not saving changes by stating that a ticket has been created for the engineering team to investigate the issue. The creation of the ticket is also supported by the tool results, which confirm that a ticket (TKT-8E968877) was successfully created.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_010869",
+      "session_id": "2a4ed03b8b3f",
+      "trace_id": "1a4dee9406efad8813d1fde2c5094e61",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "The bug was patched and a fix was deployed to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4385.5,
+      "tokens": 1642,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the issue, which aligns with the reference resolution's intent to address the bug. Both resolutions aim to resolve the same underlying problem.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding the login auth feature not saving changes and the action taken to create a ticket for investigation. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_038448",
+      "session_id": "006c940b70e6",
+      "trace_id": "92cb2fac64bd031eaf0037ade66488fb",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "The bug was patched and a fix was deployed to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4138.1,
+      "tokens": 1626,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the issue, which aligns with the reference resolution of patching the bug and deploying a fix. Both resolutions address the same problem and involve routing the issue to engineering for further action.",
+        "groundedness": "The agent's response acknowledges the user's issue with the mobile app crashing and confirms the creation of a ticket for further investigation. This is fully supported by the user's request and the action taken (creating a ticket). There are no unsupported claims in the response.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_015850",
+      "session_id": "4c5ff2707a7f",
+      "trace_id": "a405b1c0951a21db0f9528321cbd0439",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "Created a ticket for engineering to investigate the bug causing the notifications section to crash.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3735.9,
+      "tokens": 1634,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involved creating a ticket for engineering to investigate the bug, which aligns with the reference resolution of addressing the bug through engineering support.",
+        "groundedness": "The agent's response is fully supported by the user's request about the notifications section crashing and the action taken to create a ticket for investigation. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_030604",
+      "session_id": "a4c644e227a8",
+      "trace_id": "13d3b256e845e54fa4ae39d94e154fd7",
+      "issue_type": "bug",
+      "predicted_issue_type": "bug",
+      "reference": "Patched the bug and deployed a fix to production.",
+      "resolution": "Patched the bug and deployed a fix to production.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4526.8,
+      "tokens": 1659,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the crashing issue, which aligns with the reference resolution of patching the bug and deploying a fix. Both resolutions address the same underlying problem and involve routing the issue to engineering for resolution.",
+        "groundedness": "The agent's reply is fully supported by the user's request about the analytics dashboard crashing and the action taken to create a ticket for further investigation. There are no unsupported claims.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_085906",
+      "session_id": "e2c03f4023be",
+      "trace_id": "b2f80278c243d41855b4aed2572b8124",
+      "issue_type": "performance",
+      "predicted_issue_type": "performance",
+      "reference": "Optimized queries and increased resource allocation.",
+      "resolution": "Optimized queries and increased resource allocation.",
+      "action": "create_ticket",
+      "outcome": "escalated",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "escalate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 6800.9,
+      "tokens": 2855,
+      "llm_calls": 5,
+      "spans": 17,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution by creating a ticket for the engineering team to optimize queries and increase resource allocation, which is the same handling as described in the reference.",
+        "groundedness": "The agent's reply is fully supported by the user's request about queries timing out and the tool results indicating performance issues. The mention of optimizing queries and resource allocation aligns with the knowledge base article on performance degradation. The creation of a ticket for the engineering team is also supported by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_071577",
+      "session_id": "65905884d59c",
+      "trace_id": "c1ddbf6c7ae8b3fd917f6d1e2d3fb29c",
+      "issue_type": "performance",
+      "predicted_issue_type": "performance",
+      "reference": "Optimized queries and increased resource allocation.",
+      "resolution": "Optimized queries and increased resource allocation.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3895.6,
+      "tokens": 1640,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate the performance issues, which aligns with the reference resolution of optimizing queries and increasing resource allocation. Both resolutions address the same underlying problem and involve routing the issue to engineering for further action.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding slow loading times and the tool results indicating performance degradation. The creation of a ticket for the engineering team aligns with the need to investigate the performance issues.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_043783",
+      "session_id": "2312c07ca15d",
+      "trace_id": "0cc1ed2c2fa27f52dfa5f620ec0b571b",
+      "issue_type": "performance",
+      "predicted_issue_type": "performance",
+      "reference": "Optimized queries and increased resource allocation.",
+      "resolution": "The performance degradation was addressed by optimizing queries and increasing resource allocation.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 6450.7,
+      "tokens": 2867,
+      "llm_calls": 5,
+      "spans": 18,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involves creating a ticket for the engineering team to investigate and address the performance issues, which aligns with the reference resolution of optimizing queries and increasing resource allocation.",
+        "groundedness": "The agent's reply is fully supported by the user's request regarding the slow loading of the notifications page and the tool results indicating performance degradation as a relevant issue. The creation of a ticket for the engineering team aligns with the need to investigate the reported performance issue.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_052194",
+      "session_id": "b42cc06f463c",
+      "trace_id": "f7b8004058fa3ae5f5a6b789196f8b02",
+      "issue_type": "security_concern",
+      "predicted_issue_type": "security_concern",
+      "reference": "Investigated logs, mitigated the issue, and updated security settings.",
+      "resolution": "The issue was investigated, and security settings were updated to mitigate the vulnerability.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4197.3,
+      "tokens": 1744,
+      "llm_calls": 3,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involved investigating the issue and updating security settings, which aligns with the reference resolution. Additionally, the agent created a ticket for the engineering team to further investigate, which is appropriate given the nature of the vulnerability.",
+        "groundedness": "The agent's reply acknowledges the user's report of a vulnerability and confirms the creation of a ticket for further investigation, which is supported by the tool results indicating that a ticket was indeed created.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_086600",
+      "session_id": "c45721972cdc",
+      "trace_id": "899a4f6b93c6b72abb081aa61240b8fa",
+      "issue_type": "security_concern",
+      "predicted_issue_type": "security_concern",
+      "reference": "Investigated logs, mitigated the issue, and updated security settings.",
+      "resolution": "The issue was investigated, and security settings were updated.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "access_check",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "get_account_status:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4724.9,
+      "tokens": 1757,
+      "llm_calls": 3,
+      "spans": 16,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution involved investigating the issue and updating security settings, which aligns with the reference resolution. Additionally, the agent created a ticket for the engineering team to further investigate the vulnerability, which is a necessary step in handling such issues.",
+        "groundedness": "The agent's reply is fully supported by the user's request and the actions taken (creating a ticket for investigation). The mention of the ticket number and assurance of follow-up aligns with the user's concern about a vulnerability.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_051819",
+      "session_id": "4f044cced636",
+      "trace_id": "c8c38ec55b5a1d0123e2ac6cf4addd81",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4209.8,
+      "tokens": 1633,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly, capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request to customize billing by confirming that the request has been captured and added to the product backlog. This is supported by the tool results indicating that the feature request was recorded. Additionally, the creation of a ticket is also mentioned, which is consistent with the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_005274",
+      "session_id": "1ea2154b089f",
+      "trace_id": "b6da2379397f30742db2b109a54c153a",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4399.7,
+      "tokens": 1647,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply directly addresses the user's request by confirming that the suggestion for customizing the mobile app has been captured and added to the product backlog. This is supported by the tool results indicating that the request was recorded as a feature request.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_046028",
+      "session_id": "e74270a7f679",
+      "trace_id": "7e197edc942a442d2b1ff6b09db2de16",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3831.3,
+      "tokens": 1624,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request for analytics dashboard support and confirms that the request has been captured and added to the product backlog, as indicated by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_016234",
+      "session_id": "7944a91d0846",
+      "trace_id": "baa28f21a1e35ef3b0a6f4b25c616ed1",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4566.2,
+      "tokens": 1633,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request for API integration support and is fully supported by the tool results, which confirm that the request has been captured and added to the product backlog.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_042953",
+      "session_id": "6487f01f7dd2",
+      "trace_id": "cdac542563fd27f56146d3017bfd67cc",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3907.0,
+      "tokens": 1642,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request for data export support and confirms that the request has been captured and added to the product backlog, which is supported by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_098489",
+      "session_id": "19ee694fc5f8",
+      "trace_id": "6a5225e7bc7f193ca601c2046251df2f",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 3884.4,
+      "tokens": 1622,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request for advanced login authentication options and confirms that the request has been captured and added to the product backlog, which is supported by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_081289",
+      "session_id": "cfb9d09027a8",
+      "trace_id": "3d86426eba8616985cff356914b32d0b",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4304.0,
+      "tokens": 1625,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request for advanced options for the mobile app and confirms that the request has been captured and added to the product backlog, as indicated by the tool results. Additionally, the creation of the ticket is also supported by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_025490",
+      "session_id": "39a38a32ffb8",
+      "trace_id": "5bbc75660f3a36c041db0197e3695c64",
+      "issue_type": "feature_request",
+      "predicted_issue_type": "feature_request",
+      "reference": "Captured the request and added it to the product backlog.",
+      "resolution": "Captured the request and added it to the product backlog.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4307.1,
+      "tokens": 1635,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution exactly by capturing the request and adding it to the product backlog.",
+        "groundedness": "The agent's reply accurately reflects the user's request for advanced notification options and confirms that the request has been captured and added to the product backlog, which is supported by the tool results.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_038099",
+      "session_id": "4455db851e18",
+      "trace_id": "b296a7ff759340898cf25bd2b3cb08a3",
+      "issue_type": "other",
+      "predicted_issue_type": "other",
+      "reference": "Provided general guidance and confirmed the issue was resolved.",
+      "resolution": "Provided general guidance and confirmed the issue was resolved.",
+      "action": "none",
+      "outcome": "resolved",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4009.2,
+      "tokens": 1609,
+      "llm_calls": 3,
+      "spans": 12,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution in both the action taken and the outcome achieved.",
+        "groundedness": "The agent's reply acknowledges the user's request for general information about their account and states that general guidance has been provided, which aligns with the knowledge base article titled 'General questions'. There are no unsupported claims in the response.",
+        "tool_use": ""
+      }
+    },
+    {
+      "ticket_id": "TCKT_019347",
+      "session_id": "d8076146957b",
+      "trace_id": "35299b0909282b35efd35b9d1a001e8c",
+      "issue_type": "other",
+      "predicted_issue_type": "other",
+      "reference": "Provided general guidance and confirmed the issue was resolved.",
+      "resolution": "Provided general guidance and confirmed the issue was resolved.",
+      "action": "create_ticket",
+      "outcome": "ticket_created",
+      "hitl": false,
+      "flow": [
+        "intake",
+        "planner",
+        "knowledge_search",
+        "reasoning",
+        "reflection",
+        "policy_gate",
+        "action_ticket",
+        "respond"
+      ],
+      "tools": [
+        "search_kb:ok",
+        "create_ticket:ok"
+      ],
+      "errors": [],
+      "latency_ms": 4291.3,
+      "tokens": 1636,
+      "llm_calls": 3,
+      "spans": 14,
+      "scores": {
+        "correctness": 1.0,
+        "groundedness": 1.0,
+        "tool_use": 1.0,
+        "classification": 1.0,
+        "resolution_match": 1.0
+      },
+      "notes": {
+        "correctness": "The agent's resolution matches the reference resolution by providing general guidance and confirming the issue was resolved. Additionally, the agent created a ticket for further investigation, which aligns with the need to escalate the issue to engineering.",
+        "groundedness": "The agent's response is fully supported by the user's request to check their workspace and the action taken to create a ticket for further investigation. The ticket creation is confirmed with a ticket ID, which aligns with the user's concern.",
+        "tool_use": ""
+      }
+    }
+  ]
+}
