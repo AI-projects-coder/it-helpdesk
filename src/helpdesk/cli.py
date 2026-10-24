@@ -1,4 +1,4 @@
-"""CLI: query, eval, ui, list-agents, list-tools, trace."""
+"""CLI: query, resume, conversations, eval, ui, list-agents, list-tools, trace."""
 import json
 import os
 
@@ -25,32 +25,83 @@ def cli(otel_console: bool) -> None:
 @click.argument("text")
 @click.option("--customer-id", help="e.g. CUST_05883 (enables account check and actions)")
 @click.option("--role", default="user", type=click.Choice(["viewer", "user", "admin"]), show_default=True)
+@click.option("--conversation", "conversation_id", help="Continue this conversation (agents see earlier turns).")
 @click.option("--approve/--reject", "decision", default=None, help="Answer HITL non-interactively.")
+@click.option("--defer", is_flag=True, help="Leave a HITL approval pending; decide later with `helpdesk resume`.")
 @click.option("--trace/--no-trace", "show_trace", default=True, show_default=True)
-def query(text: str, customer_id: str | None, role: str, decision: bool | None, show_trace: bool) -> None:
-    """Run a single helpdesk query."""
+def query(text: str, customer_id: str | None, role: str, conversation_id: str | None, decision: bool | None,
+          defer: bool, show_trace: bool) -> None:
+    """Run one helpdesk turn (a new conversation unless --conversation is given)."""
+    app = _app()
+    try:
+        result = app.start(text, customer_id=customer_id, role=role, conversation_id=conversation_id)
+    except ValueError as e:
+        raise click.ClickException(str(e)) from None
+
+    if result.status == "awaiting_approval":
+        _print_approval(result.interrupt)
+        if defer:
+            click.echo(f"\nPending. Decide later: helpdesk resume {result.session_id} --approve|--reject")
+            click.echo(f"Conversation {result.conversation_id}")
+            return
+        approved = decision if decision is not None else click.confirm("   Approve this action?", default=False)
+        comment = "" if decision is not None else click.prompt("   Comment", default="", show_default=False)
+        result = app.resume(result.session_id, approved=approved, approver=os.getenv("USER", "cli-user"),
+                            comment=comment)
+
+    _print_run(result.state)
+    click.echo(f"\nConversation {result.conversation_id}  (continue with --conversation {result.conversation_id})")
+    if show_trace:
+        _print_spans(load_spans(_traces_path(), session_id=result.session_id))
+
+
+@cli.command()
+@click.argument("session_id")
+@click.option("--approve/--reject", "decision", required=True)
+@click.option("--comment", default="")
+def resume(session_id: str, decision: bool, comment: str) -> None:
+    """Approve or reject a pending action (works after a restart)."""
+    app = _app()
+    try:
+        pending = app.get_run(session_id)
+    except FileNotFoundError:
+        raise click.ClickException(f"unknown session {session_id}") from None
+    if pending.status != "awaiting_approval":
+        raise click.ClickException(f"session {session_id} is not awaiting approval")
+    _print_approval(pending.interrupt)
+    result = app.resume(session_id, approved=decision, approver=os.getenv("USER", "cli-user"), comment=comment)
+    _print_run(result.state)
+
+
+@cli.command()
+@click.option("--limit", default=15, show_default=True)
+def conversations(limit: int) -> None:
+    """List recent conversations (⏸ = an action awaits approval)."""
+    from helpdesk.conversation_store import ConversationStore
+
+    store = ConversationStore(get_settings().state_dir / "conversations.sqlite")
+    rows = store.recent(limit)
+    if not rows:
+        click.echo("No conversations yet.")
+    for c in rows:
+        flag = click.style(" ⏸", fg="yellow") if c.pending else ""
+        click.echo(f"{c.id}  {c.updated_at}  {c.turn_count:>2} turn(s)  {c.customer_id or '-':<11} {c.title}{flag}")
+
+
+def _app():
     from helpdesk.app import HelpdeskApp
     from helpdesk.config import api_key_problem
 
     if problem := api_key_problem():
         raise click.ClickException(problem)
-    app = HelpdeskApp()
-    result = app.start(text, customer_id=customer_id, role=role)
+    return HelpdeskApp()
 
-    if result.status == "awaiting_approval":
-        p = result.interrupt
-        click.secho("\n⏸  APPROVAL REQUIRED", fg="yellow", bold=True)
-        click.echo(f"   tool:   {p['tool']}  (policy rule: {p['policy_rule']})")
-        click.echo(f"   args:   {json.dumps(p['args'])}")
-        click.echo(f"   reason: {p['reason']}")
-        approved = decision if decision is not None else click.confirm("   Approve this action?", default=False)
-        comment = "" if decision is not None else click.prompt("   Comment", default="", show_default=False)
-        approver = os.getenv("USER", "cli-user")
-        result = app.resume(result.session_id, approved=approved, approver=approver, comment=comment)
 
-    _print_run(result.state)
-    if show_trace:
-        _print_spans(load_spans(_traces_path(), session_id=result.session_id))
+def _print_approval(p: dict) -> None:
+    click.secho("\n⏸  APPROVAL REQUIRED", fg="yellow", bold=True)
+    click.echo(f"   tool:   {p['tool']}  (policy rule: {p['policy_rule']})")
+    click.echo(f"   args:   {json.dumps(p['args'])}")
+    click.echo(f"   reason: {p['reason']}")
 
 
 @cli.command("eval")

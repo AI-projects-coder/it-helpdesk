@@ -78,7 +78,7 @@ def scripted_llm() -> FakeLLM:
 @pytest.fixture
 def ui(tmp_path, monkeypatch):
     monkeypatch.setattr(kb, "search", lambda query, top_k=3: copy.deepcopy(KB_HITS[:top_k]))
-    app = HelpdeskApp(llm=scripted_llm(), store=SessionStore(tmp_path))
+    app = HelpdeskApp(llm=scripted_llm(), store=SessionStore(tmp_path), state_dir=tmp_path / "state")
     monkeypatch.setattr(dashboard, "get_app", lambda: app)
     monkeypatch.setattr(dashboard, "api_key_problem", lambda: None)
     at = AppTest.from_file(str(ROOT / "streamlit_app.py"), default_timeout=30)
@@ -129,3 +129,23 @@ def test_missing_api_key_shows_clear_error(monkeypatch):
     at.run()
     assert "OPENAI_API_KEY" in at.error[0].value
     assert not at.tabs  # nothing else renders until the key is fixed
+
+
+def test_conversation_list_reopen_and_url(ui):
+    ui.chat_input[0].set_value("How do I export my data?").run()
+    cid = ui.session_state["conversation_id"]
+    assert cid and ui.query_params["c"] == cid
+
+    ui.button(key=f"conv_{cid}").click().run()  # reopen from the sidebar list
+    assert "Here is what to do next." in texts(ui)
+
+    next(b for b in ui.button if b.label == "➕ New conversation").click().run()
+    assert ui.session_state["conversation_id"] is None
+    assert "Here is what to do next." not in texts(ui)
+    assert ui.button(key=f"conv_{cid}")  # old conversation still listed
+
+
+def test_follow_up_in_ui_uses_history(ui):
+    ui.chat_input[0].set_value("How do I export my data?").run()
+    ui.chat_input[0].set_value("It still does not work").run()
+    assert any("used 1 earlier turn" in c.value for c in ui.caption)

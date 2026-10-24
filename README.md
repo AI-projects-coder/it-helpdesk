@@ -12,6 +12,7 @@ The design keeps the core loop simple so reviewers can follow execution: explici
 | Governance | YAML tool registry, AI registry, policy-as-code, Pydantic contracts, PII redaction |
 | Observability | OpenTelemetry spans on every node, tool and LLM call, exported to JSONL/console |
 | Evaluation | 50 frozen golden tickets; correctness, groundedness, tool use; baseline + regression check |
+| Conversations | Multi-turn: agents see a bounded summary of earlier turns; conversations and pending approvals persist in SQLite |
 | Interfaces | `helpdesk` CLI and a Streamlit dashboard (chat, approvals, traces, evals, registry) |
 
 ---
@@ -38,14 +39,37 @@ helpdesk ui                        # dashboard at http://localhost:8501
 | *"Please refund the extra 900 dollars"* | Denied by policy rule `refund-limit` → escalated |
 | Role **viewer** + a bug report | Denied by `role-permission` → escalated |
 | Sidebar → **Send example** | Runs any of the 50 golden tickets |
+| After an answer, ask a follow-up (*"it still doesn't work"*) | Caption shows *used 1 earlier turn(s)*; the reply builds on the earlier resolution |
+| ➕ **New conversation**, then click an old one in the sidebar | Old conversation reopens, including a pending approval (⏸) you can still decide |
+| Refresh the page | The current conversation reopens (its id is in the URL, `?c=…`) |
 | 🔭 Traces tab | Span timeline / table for any session |
 | 📊 Evaluation tab | Scores vs baseline, regression check, run an eval |
+
+## Docker
+
+One image serves the dashboard and the CLI. It runs as a non-root user, and no secrets are baked in: the key comes from the environment at runtime. On first start the KB index is built into the runtime volume.
+
+```bash
+docker compose up --build -d                     # dashboard at http://localhost:8080 (reads .env)
+docker compose run --rm helpdesk query "How do I export my data?"
+docker compose run --rm helpdesk eval --limit 5
+docker compose run --rm helpdesk smoke           # 11 live scenarios inside the container
+docker compose down                              # add -v to also delete the data volume
+```
+
+Without compose: `docker build -t it-helpdesk . && docker run --env-file .env -p 8080:8080 -v helpdesk-data:/var/lib/helpdesk it-helpdesk`.
+
+Everything the app writes (KB index, sessions, traces, conversations, checkpoints) goes to `RUNTIME_DIR` (`/var/lib/helpdesk` in the image), so it survives container restarts. That includes pending approvals. The image listens on `$PORT` (default 8080) and has a health check on `/_stcore/health`.
 
 ## CLI
 
 ```bash
 helpdesk query "My account is locked" --customer-id CUST_02280   # prompts for approval
 helpdesk query "..." --approve | --reject | --role viewer | --no-trace
+helpdesk query "It still fails" --customer-id CUST_02280 --conversation <conversation_id>   # follow-up turn
+helpdesk query "My account is locked" --customer-id CUST_02280 --defer   # leave approval pending
+helpdesk resume <session_id> --approve|--reject [--comment "..."]          # decide later, any process
+helpdesk conversations                                                      # recent conversations, ⏸ = pending
 helpdesk trace <session_id>          # span tree for a session (id is printed by `query`)
 helpdesk eval                        # all 50 tickets vs baseline; exit code 1 on regression
 helpdesk eval --limit 5 | --ticket TCKT_025902 | --split panel | --save-baseline
@@ -56,7 +80,7 @@ helpdesk ui [--port 8501] [--host 0.0.0.0] [--headless]
 ## Tests
 
 ```bash
-pytest                          # 116 unit/graph/UI tests, scripted fake LLM, no API calls (~4 s)
+pytest                          # 129 unit/graph/UI tests, scripted fake LLM, no API calls (~5 s)
 pytest -m integration           # live Chroma + OpenAI embedding check
 python scripts/smoke_test.py    # 11 live end-to-end scenarios incl. prompt injection (~1 min)
 ruff check .
@@ -91,6 +115,14 @@ flowchart TD
 ```
 
 Any node that raises or times out marks the run `failed`, and routing sends it to `escalate`: the fallback is always a human.
+
+### Conversations & state
+
+A **conversation** is an ordered list of **turns**, and each turn is one graph run (one session, one trace). That keeps evaluation, tracing and replay per-ticket while the chat feels continuous.
+
+- **Context.** For a follow-up, the planner, reasoning and reflection agents get a summary of the last 3 completed turns: question, resolution, action, outcome and ticket/reference id, truncated to 300 chars per field. The summary is built from the already-redacted session records and only includes turns **for the same customer**, so one customer's data never leaks into another's context.
+- **Persistence.** LangGraph checkpoints (`SqliteSaver`) and the conversation index live in `data/state/*.sqlite`. A pending approval survives a restart and can be resumed from another process (`helpdesk resume`) or from the dashboard. In production these would move to Postgres / Cloud SQL (or Firestore for the index); the stores are isolated classes for that reason.
+- **Scope.** Eval and smoke runs use `track_conversation=False`, so they don't fill the conversation list. There is no login yet: every dashboard user sees all conversations (fine for a single-user demo; real users need auth + per-user scoping).
 
 ### Agents (AI registry: `config/agents.yaml`)
 
@@ -175,13 +207,18 @@ Caveats: the judge is the same small model as the agent, so correctness is gener
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | |
 | `OPENAI_API_KEY` | — | required |
 | `KB_TOP_K` | `3` | KB results given to the reasoning agent |
+| `RUNTIME_DIR` | `data/` | where the index, sessions, traces and SQLite state are written (`/var/lib/helpdesk` in Docker) |
+| `PORT` | `8080` (Docker) | dashboard port inside the container |
 
 ## Project layout
 
 ```
 config/            tools.yaml · agents.yaml · policy.yaml
 data/              raw CSV · golden_subset.json · accounts.json · kb_articles.json · eval/baseline.json
+                   (generated, git-ignored: chroma/ · sessions/ · traces/ · state/)
 scripts/           prepare_data.py · smoke_test.py
+docker/            entrypoint.sh (ui | smoke | any helpdesk subcommand)
+Dockerfile · docker-compose.yml · .dockerignore
 src/helpdesk/
   app.py           HelpdeskApp.start() / resume(): used by CLI, dashboard, eval
   graph.py         StateGraph wiring and routers
@@ -192,7 +229,8 @@ src/helpdesk/
   policy/          engine · redaction
   eval/            runner · scorers · baseline
   telemetry.py     OTel setup, span helper, JSONL exporter
-  session_store.py session capture
+  session_store.py session capture (per turn, JSON)
+  conversation_store.py conversations → turns index (SQLite)
   llm.py           provider factory + LLMClient protocol
   cli.py           click CLI
   ui/              dashboard (Streamlit) · views (pure data shaping)
@@ -204,7 +242,7 @@ tests/             116 tests; fakes.py holds the scripted LLM
 - **Why LangGraph.** Explicit, auditable control flow (planning, routing, reflection, HITL interrupt + checkpointing) without hiding the loop. OTel is the vendor-neutral tracing standard, and the `LLMClient` protocol avoids provider lock-in.
 - **Agent failure.** Per-node timeout (60 s), overall graph budget (180 s), SDK retries for LLM calls, tenacity retries for transient tool errors, and fallback to escalation. A circuit breaker is the next step for repeated provider failures.
 - **Caching.** Safe to cache KB search by query hash with a TTL, and LLM responses in eval mode. Never cache HITL or state-changing actions. (Not implemented yet.)
-- **State & concurrency.** Nodes return partial updates, and append-only fields use reducers, so there's no shared mutable state. The checkpointer is in-memory; production would use Postgres/Redis so HITL survives restarts and scales across instances.
+- **State & concurrency.** Nodes return partial updates, and append-only fields use reducers, so there's no shared mutable state. Checkpoints are in SQLite (survives restarts, single node); for several instances use the Postgres checkpointer so any instance can resume any session.
 - **Distributed.** Agents could become separate services (A2A or a queue), with a saga pattern for multi-step actions and event sourcing for audit. Trace context propagates via W3C headers, and `session_id` correlates across services.
 - **AI gateway.** Rate limits, cost tracking, model routing and central auth. Here, the provider factory plays that role.
 - **Cost.** Small model everywhere, short prompts, top-3 KB context, deterministic checks before LLM checks, judge tokens tracked separately.
@@ -212,4 +250,4 @@ tests/             116 tests; fakes.py holds the scripted LLM
 
 ## Not yet implemented
 
-Deterministic **replay** from captured sessions (capture is done), circuit breaker, KB/LLM caching, OTLP export, persistent checkpointer, Docker/CI/Cloud Run deployment.
+Deterministic **replay** from captured sessions (capture is done), circuit breaker, KB/LLM caching, OTLP export, auth / per-user conversation scoping, CI and Cloud Run deployment.

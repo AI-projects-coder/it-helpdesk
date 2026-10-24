@@ -145,7 +145,7 @@ def scripted_agents() -> FakeLLM:
 
 def test_run_eval_end_to_end(tmp_path, monkeypatch):
     monkeypatch.setattr(kb, "search", lambda query, top_k=3: copy.deepcopy(KB_HITS[:top_k]))
-    app = HelpdeskApp(llm=scripted_agents(), store=SessionStore(tmp_path))
+    app = HelpdeskApp(llm=scripted_agents(), store=SessionStore(tmp_path), state_dir=tmp_path / "state")
     judge = FakeLLM({
         "judge_correctness": {"score": 1.0, "reason": "same"},
         "judge_groundedness": {"score": 0.5, "reason": "minor"},
@@ -167,6 +167,7 @@ def test_run_eval_end_to_end(tmp_path, monkeypatch):
     s = run["summary"]
     assert s["tickets"] == 2 and s["hitl_rate"] == 0.5 and s["correctness"] == 1.0
     assert run["config"]["judge_prompt_version"] == scorers.JUDGE_PROMPT_VERSION
+    assert app.conversations.recent() == []  # eval runs stay out of the conversation list
 
 
 # --- CLI exit code ---

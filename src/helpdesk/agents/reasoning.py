@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from helpdesk.agents.base import Deps, format_context
+from helpdesk.agents.base import Deps, format_context, format_history
 from helpdesk.state import ActionName, HelpdeskState
 
 SYSTEM = """You are the reasoning agent of an IT helpdesk. Using ONLY the context provided
@@ -25,6 +25,9 @@ SYSTEM = """You are the reasoning agent of an IT helpdesk. Using ONLY the contex
     none                      instructions or guidance are enough
 - refund_amount: only for issue_refund, the amount the user mentions, otherwise null.
 - security_changes: only for update_security_settings.
+
+If earlier turns are shown and the user is following up, acknowledge what was already done
+(e.g. the earlier ticket or reset) instead of repeating it blindly.
 
 Do not state facts that are not in the context."""
 
@@ -49,6 +52,8 @@ def reasoning(state: HelpdeskState, deps: Deps) -> dict:
         f"Planner: issue_type={plan['issue_type']}, urgency={plan['urgency']}, summary={plan['summary']}\n\n"
         f"{format_context(state)}"
     )
+    if history := format_history(state):
+        user = f"{history}\n\n{user}"
     feedback = (state.get("reflection") or {}).get("feedback")
     if feedback:
         user += f"\n\nA reviewer rejected your previous draft. Fix this: {feedback}"

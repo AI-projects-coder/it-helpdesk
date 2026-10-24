@@ -28,7 +28,7 @@ def stub_kb(monkeypatch):
 def make_app(tmp_path):
     def _make(responses: dict, **deps_kwargs):
         llm = FakeLLM(responses)
-        app = HelpdeskApp(llm=llm, store=SessionStore(tmp_path), **deps_kwargs)
+        app = HelpdeskApp(llm=llm, store=SessionStore(tmp_path), state_dir=tmp_path / "state", **deps_kwargs)
         return app, llm
 
     return _make

@@ -116,9 +116,15 @@ def build_articles(rows: list[dict]) -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--no-index", action="store_true", help="skip building the Chroma index")
+    parser.add_argument("--index-only", action="store_true",
+                        help="only (re)build the Chroma index from the frozen kb_articles.json (used in Docker)")
+    parser.add_argument("--if-missing", action="store_true", help="with --index-only: skip if the index has docs")
     args = parser.parse_args()
 
     s = get_settings()
+    if args.index_only:
+        build_kb_index(s, json.loads(s.kb_articles_path.read_text()), args.if_missing)
+        return
     rows = load_rows(s.raw_csv)
 
     golden = build_golden(rows)
@@ -135,12 +141,19 @@ def main() -> None:
     print(f"kb articles: {len(articles)} -> {s.kb_articles_path}")
 
     if not args.no_index:
-        from helpdesk.config import api_key_problem
-        from helpdesk.tools.kb import build_index
+        build_kb_index(s, articles)
 
-        if problem := api_key_problem(replace(s, llm_provider="openai")):  # embeddings always use OpenAI
-            raise SystemExit(problem)
-        print(f"chroma index: {build_index(articles)} docs -> {s.chroma_dir}")
+
+def build_kb_index(s, articles: list[dict], if_missing: bool = False) -> None:
+    from helpdesk.config import api_key_problem
+    from helpdesk.tools.kb import build_index, index_count
+
+    if if_missing and (n := index_count()):
+        print(f"chroma index: {n} docs already in {s.chroma_dir}")
+        return
+    if problem := api_key_problem(replace(s, llm_provider="openai")):  # embeddings always use OpenAI
+        raise SystemExit(problem)
+    print(f"chroma index: {build_index(articles)} docs -> {s.chroma_dir}")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from helpdesk.agents.base import Deps
+from helpdesk.agents.base import Deps, format_history
 from helpdesk.state import HelpdeskState, IssueType
 
 SYSTEM = """You are the planning agent of an IT helpdesk. Classify the user's request and plan the work.
@@ -22,7 +22,9 @@ Issue types:
 
 Classify by what is wrong, not by which product area is mentioned
 ("the billing page is slow" is performance, not billing_problem).
-Set needs_account_check to true only for account_access, security_concern, or billing_problem."""
+Set needs_account_check to true only for account_access, security_concern, or billing_problem.
+If earlier turns are shown, the request may be a follow-up ("it still fails"): classify what the
+user means in that context."""
 
 # Data minimization: customer account data is only fetched for issue types where it
 # matters, whatever the LLM asks for. The LLM may still skip the lookup for these.
@@ -40,6 +42,8 @@ class Plan(BaseModel):
 
 def planner(state: HelpdeskState, deps: Deps) -> dict:
     user = f"Request: {state['query']}\nCustomer id available: {bool(state.get('customer_id'))}"
+    if history := format_history(state):
+        user = f"{history}\n\n{user}"
     plan = deps.llm.structured(Plan, SYSTEM, user, name="planner").parsed
     plan.needs_account_check = (
         plan.needs_account_check and plan.issue_type in ACCOUNT_ISSUE_TYPES and bool(state.get("customer_id"))

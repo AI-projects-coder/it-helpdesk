@@ -6,9 +6,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-ROOT = Path(__file__).resolve().parents[2]
+# HELPDESK_ROOT is set in the container, where the package is installed into site-packages;
+# locally the project root is found relative to this file (src/helpdesk/config.py).
+ROOT = Path(os.getenv("HELPDESK_ROOT") or Path(__file__).resolve().parents[2])
 CONFIG_DIR = ROOT / "config"
-DATA_DIR = ROOT / "data"
+DATA_DIR = ROOT / "data"  # frozen inputs shipped with the code
+# Everything the app writes at runtime (index, sessions, traces, SQLite state); a volume in Docker.
+RUNTIME_DIR = Path(os.getenv("RUNTIME_DIR") or DATA_DIR)
 
 load_dotenv(ROOT / ".env")
 
@@ -28,10 +32,11 @@ class Settings:
     golden_path: Path = DATA_DIR / "golden_subset.json"
     accounts_path: Path = DATA_DIR / "accounts.json"
     kb_articles_path: Path = DATA_DIR / "kb_articles.json"
-    chroma_dir: Path = DATA_DIR / "chroma"
-    sessions_dir: Path = DATA_DIR / "sessions"
-    traces_dir: Path = DATA_DIR / "traces"
-    eval_dir: Path = DATA_DIR / "eval"
+    eval_dir: Path = DATA_DIR / "eval"  # baseline.json is versioned; run files are written next to it
+    chroma_dir: Path = RUNTIME_DIR / "chroma"
+    sessions_dir: Path = RUNTIME_DIR / "sessions"
+    traces_dir: Path = RUNTIME_DIR / "traces"
+    state_dir: Path = RUNTIME_DIR / "state"  # SQLite: LangGraph checkpoints + conversations
 
 
 @lru_cache

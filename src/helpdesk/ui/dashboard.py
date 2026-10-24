@@ -1,7 +1,8 @@
 """Streamlit dashboard: chat with the helpdesk, approve HITL actions, inspect traces and evals.
 
 Run with `helpdesk ui` (or `streamlit run streamlit_app.py`). Each chat message is
-a new helpdesk session; the dashboard is a thin layer over HelpdeskApp.
+one helpdesk session (turn) inside a conversation; the agents see a short summary of
+earlier turns. Conversations and pending approvals persist in SQLite (data/state/).
 """
 import threading
 import time
@@ -49,6 +50,35 @@ def theme() -> str:
 def init_state() -> None:
     st.session_state.setdefault("turns", [])        # [{"query", "customer_id", "role", "result": RunResult}]
     st.session_state.setdefault("trace_session", None)
+    st.session_state.setdefault("conversation_id", None)
+    # the conversation id lives in the URL (?c=...), so a page refresh reopens it
+    url_cid = st.query_params.get("c")
+    if url_cid and st.session_state.conversation_id != url_cid:
+        open_conversation(url_cid)
+
+
+def open_conversation(conversation_id: str | None) -> None:
+    """Load a stored conversation (or clear the chat for a new one). Pending approvals stay resumable."""
+    st.session_state.conversation_id = conversation_id
+    st.session_state.turns = []
+    if conversation_id is None:
+        st.query_params.pop("c", None)
+        return
+    app = get_app()
+    conv = app.conversations.get(conversation_id)
+    if conv is None:
+        st.query_params.pop("c", None)
+        st.session_state.conversation_id = None
+        return
+    st.query_params["c"] = conversation_id
+    for t in conv.turns:
+        try:
+            result = app.get_run(t.session_id)
+        except FileNotFoundError:  # turn still running elsewhere or record lost
+            continue
+        st.session_state.turns.append(
+            {"query": t.query, "customer_id": t.customer_id, "role": t.role, "result": result}
+        )
 
 
 # --- sidebar ---------------------------------------------------------------
@@ -82,13 +112,27 @@ def sidebar() -> tuple[str | None, str, str | None]:
             example = tickets[idx]["initial_message"]
             st.session_state["example_customer"] = tickets[idx]["customer_id"]
 
+        conversations_panel()
         st.divider()
-        if st.button("New conversation", width="stretch"):
-            st.session_state.turns = []
-            st.rerun()
         st.caption(f"LLM: `{s.llm_provider}/{s.llm_model}` · judge `{s.judge_model}` · KB top-k {s.kb_top_k}")
 
     return (None if customer == "(none)" else customer), role, example
+
+
+def conversations_panel() -> None:
+    st.header("Conversations")
+    if st.button("➕ New conversation", width="stretch"):
+        open_conversation(None)
+        st.rerun()
+    current = st.session_state.conversation_id
+    for conv in get_app().conversations.recent(15):
+        icon = "⏸️ " if conv.pending else ""
+        label = f"{icon}{conv.title} · {conv.turn_count}"
+        if st.button(label, key=f"conv_{conv.id}", width="stretch",
+                     type="primary" if conv.id == current else "secondary",
+                     help=f"{conv.customer_id or 'no customer'} · updated {conv.updated_at}"):
+            open_conversation(conv.id)
+            st.rerun()
 
 
 # --- chat ------------------------------------------------------------------
@@ -129,7 +173,9 @@ def render_turn(i: int, turn: dict) -> None:
         st.markdown(state.get("final_response", ""))
         cols = st.columns([2, 2, 3])
         cols[0].caption(f"{icon} {text}")
-        cols[1].caption(f"issue `{(state.get('plan') or {}).get('issue_type', '-')}`")
+        history = len(state.get("history") or [])
+        context = f" · used {history} earlier turn(s)" if history else ""
+        cols[1].caption(f"issue `{(state.get('plan') or {}).get('issue_type', '-')}`{context}")
         if cols[2].button(f"Trace {result.session_id}", key=f"trace_{i}", type="tertiary"):
             st.session_state.trace_session = result.session_id
             st.toast("Open the Traces tab to see this session")
@@ -162,6 +208,10 @@ def chat_tab(customer_id: str | None, role: str, example: str | None) -> None:
     for i, turn in enumerate(turns):
         render_turn(i, turn)
 
+    first_customer = turns[0]["customer_id"] if turns else None
+    if turns and customer_id != first_customer:
+        st.caption(f"ℹ️ Earlier turns were for {first_customer or 'no customer'}; their context is only shared "
+                   "with the same customer. Start a new conversation for a different customer.")
     pending = any(t["result"].status == "awaiting_approval" for t in turns)
     typed = st.chat_input("Describe your issue…", disabled=pending)
     query = typed or example
@@ -172,7 +222,10 @@ def chat_tab(customer_id: str | None, role: str, example: str | None) -> None:
         if example:
             customer_id = st.session_state.pop("example_customer", customer_id)
         with st.spinner("Agents working…"):
-            result = get_app().start(query, customer_id=customer_id, role=role)
+            result = get_app().start(query, customer_id=customer_id, role=role,
+                                     conversation_id=st.session_state.conversation_id)
+        st.session_state.conversation_id = result.conversation_id
+        st.query_params["c"] = result.conversation_id
         turns.append({"query": query, "customer_id": customer_id, "role": role, "result": result})
         st.rerun()
 

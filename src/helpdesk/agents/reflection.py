@@ -6,7 +6,7 @@ retrieved), then an LLM judgment of whether the claims are supported.
 
 from pydantic import BaseModel
 
-from helpdesk.agents.base import Deps, format_context, latest_tool_output
+from helpdesk.agents.base import Deps, format_context, format_history, latest_tool_output
 from helpdesk.state import HelpdeskState
 
 SYSTEM = """You review a helpdesk draft for groundedness. Given the user's REQUEST, the tool
@@ -16,7 +16,7 @@ The PROPOSED ACTION is executed by the system right after your review, so saying
 will happen is supported.
 
 Supported:
-- restating the user's request, and anything in the context
+- restating the user's request, and anything in the context or in earlier turns
 - the proposed action as a next step, and its normal consequence (create_ticket -> the
   engineering/support team will investigate and follow up)
 - courtesy and follow-up phrases ("we'll keep you informed", "let us know if...")
@@ -51,6 +51,7 @@ def reflection(state: HelpdeskState, deps: Deps) -> dict:
     else:
         # resolution_summary is the article's resolution label (used for eval), not a claim to the customer
         user = (
+            f"{format_history(state) + chr(10) * 2 if state.get('history') else ''}"
             f"REQUEST:\n{state['query']}\n\nCONTEXT:\n{format_context(state)}\n\n"
             f"PROPOSED ACTION: {draft['action']} ({draft['action_reason']})\n\n"
             f"DRAFT REPLY:\n{draft['customer_reply']}"

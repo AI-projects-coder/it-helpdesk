@@ -74,7 +74,7 @@ SCENARIOS = [
 
 def run(app: HelpdeskApp, sc: Scenario) -> tuple[RunResult, list[str], float]:
     start = time.perf_counter()
-    r = app.start(sc.query, customer_id=sc.customer_id, role=sc.role)
+    r = app.start(sc.query, customer_id=sc.customer_id, role=sc.role, track_conversation=False)
     if r.status == "awaiting_approval":
         if sc.approve is None:
             return r, ["paused for approval unexpectedly"], time.perf_counter() - start

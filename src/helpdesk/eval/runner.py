@@ -48,7 +48,8 @@ def _trace_usage(trace_id: str) -> dict:
 
 def run_ticket(app: HelpdeskApp, judge: scorers.Judge, ticket: dict) -> dict:
     start = time.perf_counter()
-    result = app.start(ticket["initial_message"], customer_id=ticket["customer_id"], role="user")
+    result = app.start(ticket["initial_message"], customer_id=ticket["customer_id"], role="user",
+                       track_conversation=False)
     hitl = result.status == "awaiting_approval"
     if hitl:
         result = app.resume(result.session_id, approved=True, approver="eval-auto")

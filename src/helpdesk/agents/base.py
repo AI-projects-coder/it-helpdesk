@@ -90,6 +90,19 @@ def latest_tool_output(state: HelpdeskState, tool: str) -> dict | None:
     return None
 
 
+def format_history(state: HelpdeskState) -> str:
+    """Earlier turns of this conversation, or "" for a first message."""
+    turns = state.get("history") or []
+    if not turns:
+        return ""
+    lines = ["EARLIER IN THIS CONVERSATION (oldest first):"]
+    for i, t in enumerate(turns, 1):
+        ref = f", reference {t['reference']}" if t.get("reference") else ""
+        lines.append(f"{i}. user: {t['query']}\n   resolution: {t['resolution']} "
+                     f"(action {t['action']}, outcome {t['outcome']}{ref})")
+    return "\n".join(lines)
+
+
 def format_context(state: HelpdeskState) -> str:
     """Tool evidence shown to the reasoning and reflection agents."""
     parts = []

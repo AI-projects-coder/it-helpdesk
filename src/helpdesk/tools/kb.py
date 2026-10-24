@@ -51,6 +51,14 @@ def build_index(articles: list[dict]) -> int:
     return col.count()
 
 
+def index_count() -> int:
+    """Documents in the KB index; 0 if it was never built."""
+    try:
+        return chromadb.PersistentClient(path=str(get_settings().chroma_dir)).get_collection(COLLECTION).count()
+    except Exception:  # missing collection / empty dir
+        return 0
+
+
 @lru_cache
 def _collection():
     return chromadb.PersistentClient(path=str(get_settings().chroma_dir)).get_collection(COLLECTION)

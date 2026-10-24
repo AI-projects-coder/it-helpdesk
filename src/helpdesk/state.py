@@ -19,6 +19,7 @@ Outcome = Literal["resolved", "action_completed", "ticket_created", "escalated"]
 class HelpdeskState(TypedDict, total=False):
     # identity / correlation
     session_id: str
+    conversation_id: str | None
     trace_id: str
     root_span_id: str
     started_at: float  # per-invocation budget clock, reset after HITL resume
@@ -27,6 +28,9 @@ class HelpdeskState(TypedDict, total=False):
     query: str
     customer_id: str | None
     role: str
+
+    # earlier turns of the same conversation (redacted, same customer only), oldest first
+    history: list[dict[str, Any]]
 
     # conversation + audit trail
     messages: Annotated[list[dict[str, Any]], add]
