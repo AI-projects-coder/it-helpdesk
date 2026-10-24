@@ -1,5 +1,7 @@
 # IT Helpdesk — Multi-Agent System
 
+[![CI](https://github.com/AI-projects-coder/it-helpdesk/actions/workflows/ci.yml/badge.svg)](https://github.com/AI-projects-coder/it-helpdesk/actions/workflows/ci.yml)
+
 A multi-agent IT helpdesk built on **LangGraph**. Its tools are policy-gated, it pauses for **human approval** before high-risk actions, it emits **OpenTelemetry** traces for every step, and it has an **evaluation harness** with regression detection. You can use it from a CLI or a Streamlit dashboard.
 
 The design keeps the core loop simple so reviewers can follow execution: explicit nodes, one typed state object, and one path for every tool call.
@@ -44,6 +46,13 @@ helpdesk ui                        # dashboard at http://localhost:8501
 | Refresh the page | The current conversation reopens (its id is in the URL, `?c=…`) |
 | 🔭 Traces tab | Span timeline / table for any session |
 | 📊 Evaluation tab | Scores vs baseline, regression check, run an eval |
+
+## CI
+
+| Workflow | When | What | Cost |
+|---|---|---|---|
+| [`ci.yml`](.github/workflows/ci.yml) | every push to `main`, every PR | `ruff` lint, 129 tests (fake LLM), Docker build + boot/non-root/no-secret checks | free, no API key |
+| [`live-eval.yml`](.github/workflows/live-eval.yml) | manual (Actions → *Live eval* → Run) | 11 live smoke scenarios + 50-ticket eval vs `data/eval/baseline.json`; fails on regression; uploads results | ~$0.05, needs `OPENAI_API_KEY` secret |
 
 ## Docker
 
