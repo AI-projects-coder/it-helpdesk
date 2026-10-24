@@ -1,0 +1,22 @@
+# Files never uploaded to Cloud Build (the build context). Mirrors .dockerignore.
+.gcloudignore
+.git/
+.github/
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.DS_Store
+data/chroma/
+data/sessions/
+data/traces/
+data/state/
+data/eval/*
+!data/eval/baseline.json
+tests/

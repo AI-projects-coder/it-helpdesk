@@ -70,6 +70,36 @@ Without compose: `docker build -t it-helpdesk . && docker run --env-file .env -p
 
 Everything the app writes (KB index, sessions, traces, conversations, checkpoints) goes to `RUNTIME_DIR` (`/var/lib/helpdesk` in the image), so it survives container restarts. That includes pending approvals. The image listens on `$PORT` (default 8080) and has a health check on `/_stcore/health`.
 
+## Deployment (GCP Cloud Run)
+
+**Live demo:** https://it-helpdesk-732198166820.asia-south1.run.app (project `hcl-it-desk`, region `asia-south1`)
+
+| Piece | Resource |
+|---|---|
+| Image | Artifact Registry `asia-south1-docker.pkg.dev/hcl-it-desk/it-helpdesk/app:<git-sha>`, built by Cloud Build ([cloudbuild.yaml](cloudbuild.yaml)) as SA `helpdesk-build` (source read, registry write, logs) |
+| Secret | Secret Manager `openai-api-key`, injected as `OPENAI_API_KEY`; readable only by the runtime SA |
+| Service | Cloud Run `it-helpdesk`: SA `helpdesk-run`, 2 GiB / 1 vCPU, **max 1 instance**, session affinity, 3600 s timeout, scales to zero |
+| Post-deploy check | Cloud Run Job `helpdesk-smoke` runs the 11 live scenarios with the same image and secret |
+
+```bash
+P=hcl-it-desk R=asia-south1 IMG=$R-docker.pkg.dev/$P/it-helpdesk/app TAG=$(git rev-parse --short HEAD)
+gcloud builds submit --project $P --region $R --config cloudbuild.yaml --substitutions _TAG=$TAG .
+gcloud run deploy it-helpdesk --project $P --region $R --image $IMG:$TAG \
+  --service-account helpdesk-run@$P.iam.gserviceaccount.com --set-secrets OPENAI_API_KEY=openai-api-key:latest \
+  --port 8080 --memory 2Gi --cpu 1 --cpu-boost --min-instances 0 --max-instances 1 --concurrency 20 \
+  --timeout 3600 --session-affinity --allow-unauthenticated
+gcloud run jobs update helpdesk-smoke --project $P --region $R --image $IMG:$TAG
+gcloud run jobs execute helpdesk-smoke --project $P --region $R --wait        # post-deploy check
+```
+
+Rotate the key: `printf %s "$NEW_KEY" | gcloud secrets versions add openai-api-key --data-file=- --project hcl-it-desk`, then redeploy (or restart) so the new version is picked up.
+
+**Demo-mode storage.** SQLite lives on the instance's in-memory disk, so conversations and pending approvals reset when the instance scales to zero or is redeployed; `max-instances=1` keeps all users on the one copy. For persistence and scale-out, use Cloud SQL Postgres with LangGraph's Postgres checkpointer.
+
+**Public URL.** Anyone with the link can use it, and every question spends OpenAI credits. Set a monthly limit on the OpenAI project, or redeploy with `--no-allow-unauthenticated` + IAP to restrict access to listed Google accounts.
+
+Teardown: `gcloud run services delete it-helpdesk`, `gcloud run jobs delete helpdesk-smoke`, `gcloud artifacts repositories delete it-helpdesk --location asia-south1`, `gcloud secrets delete openai-api-key` (each with `--project hcl-it-desk --region/--location asia-south1` as needed).
+
 ## CLI
 
 ```bash
@@ -227,7 +257,7 @@ data/              raw CSV · golden_subset.json · accounts.json · kb_articles
                    (generated, git-ignored: chroma/ · sessions/ · traces/ · state/)
 scripts/           prepare_data.py · smoke_test.py
 docker/            entrypoint.sh (ui | smoke | any helpdesk subcommand)
-Dockerfile · docker-compose.yml · .dockerignore
+Dockerfile · docker-compose.yml · .dockerignore · cloudbuild.yaml · .gcloudignore
 src/helpdesk/
   app.py           HelpdeskApp.start() / resume(): used by CLI, dashboard, eval
   graph.py         StateGraph wiring and routers
@@ -259,4 +289,4 @@ tests/             116 tests; fakes.py holds the scripted LLM
 
 ## Not yet implemented
 
-Deterministic **replay** from captured sessions (capture is done), circuit breaker, KB/LLM caching, OTLP export, auth / per-user conversation scoping, CI and Cloud Run deployment.
+Deterministic **replay** from captured sessions (capture is done), circuit breaker, KB/LLM caching, OTLP export, auth / per-user conversation scoping, continuous deployment from CI, persistent storage on GCP (Cloud SQL).

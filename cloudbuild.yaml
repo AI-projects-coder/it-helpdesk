@@ -1,0 +1,17 @@
+# Cloud Build: build the linux/amd64 image and push it to Artifact Registry.
+#   gcloud builds submit --project hcl-it-desk --region asia-south1 --config cloudbuild.yaml \
+#     --substitutions _TAG=$(git rev-parse --short HEAD) .
+# Runs as a dedicated least-privilege service account (source read, registry write, logs).
+substitutions:
+  _IMAGE: asia-south1-docker.pkg.dev/hcl-it-desk/it-helpdesk/app
+  _TAG: latest
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_IMAGE}:${_TAG}", "-t", "${_IMAGE}:latest", "."]
+images:
+  - "${_IMAGE}:${_TAG}"
+  - "${_IMAGE}:latest"
+serviceAccount: projects/hcl-it-desk/serviceAccounts/helpdesk-build@hcl-it-desk.iam.gserviceaccount.com
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1200s
