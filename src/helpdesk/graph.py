@@ -1,9 +1,10 @@
 """LangGraph StateGraph wiring: routing, reflection, HITL interrupt.
 
+    intake -> planner -> respond                                 (unrelated question)
     intake -> planner -> [knowledge_search] -> [access_check] -> reasoning -> reflection
                                                                    ^             |
                                                                    +-- retry ----+
-    reflection -> policy_gate -> respond                      (no action)
+    reflection -> policy_gate -> respond                      (no action, or ask for missing info)
                               -> action_ticket -> respond     (allowed)
                               -> human_approval -> action_ticket | escalate   (HITL)
                               -> escalate -> respond          (denied)
@@ -30,6 +31,8 @@ def after_planner(state: HelpdeskState) -> str:
     if state.get("failed"):
         return "escalate"
     plan = state["plan"]
+    if not plan.get("in_scope", True):
+        return "respond"  # unrelated question: no KB, no agents, fixed reply
     if plan["needs_kb"]:
         return "knowledge_search"
     return "access_check" if plan["needs_account_check"] else "reasoning"
@@ -61,6 +64,8 @@ def after_policy(state: HelpdeskState) -> str:
     if state.get("failed"):
         return "escalate"
     decision = state.get("policy_decision")
+    if state.get("missing_info"):
+        return "respond"  # ask the user for the missing customer id / amount
     if decision is None:
         return "escalate" if state.get("escalation_reason") else "respond"
     return {"allow": "action_ticket", "require_approval": "human_approval", "deny": "escalate"}[decision["effect"]]
@@ -90,7 +95,9 @@ def build_graph(deps: Deps, checkpointer: BaseCheckpointSaver | None = None) -> 
 
     g.add_edge(START, "intake")
     g.add_edge("intake", "planner")
-    g.add_conditional_edges("planner", after_planner, ["knowledge_search", "access_check", "reasoning", "escalate"])
+    g.add_conditional_edges(
+        "planner", after_planner, ["knowledge_search", "access_check", "reasoning", "escalate", "respond"]
+    )
     g.add_conditional_edges("knowledge_search", after_knowledge, ["access_check", "reasoning", "escalate"])
     g.add_conditional_edges("access_check", lambda s: after_step(s, "reasoning"), ["reasoning", "escalate"])
     g.add_conditional_edges("reasoning", lambda s: after_step(s, "reflection"), ["reflection", "escalate"])

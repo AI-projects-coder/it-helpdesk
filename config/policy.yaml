@@ -8,12 +8,12 @@
 # Rule conditions (all must match; a list means "any of"):
 #   tool, risk, role, approval_required, args_gt: {field: threshold}
 #   account_found: session fact; true/false from the account lookup, null if no lookup ran
+#   escalation:    session fact; true only for the system's hand-off ticket in the escalate node
 # Effects: allow | require_approval | deny
 version: "1.0.0"
 default_effect: deny
 
 role_permissions:
-  viewer: [search_kb]
   user: [search_kb, get_account_status, create_ticket, reset_credentials,
          update_security_settings, issue_refund]
   admin: ["*"]
@@ -28,6 +28,12 @@ rules:
     description: Automated refunds above 500 are never allowed, even with approval.
     when: {tool: issue_refund, args_gt: {amount: 500}}
     effect: deny
+
+  - id: escalation-ticket
+    description: The hand-off ticket raised when a case is escalated to a human runs without approval
+      (otherwise rejecting an action would need a second approval just to escalate).
+    when: {tool: create_ticket, escalation: true}
+    effect: allow
 
   - id: approval-required-tools
     description: Tools flagged approval_required in the registry need a human (HITL).

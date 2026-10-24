@@ -8,7 +8,7 @@ FOUND = {"account_found": True}
 
 @pytest.mark.parametrize(
     "tool, agent",
-    [("search_kb", "knowledge_search"), ("get_account_status", "access_check"), ("create_ticket", "action_ticket")],
+    [("search_kb", "knowledge_search"), ("get_account_status", "access_check")],
 )
 def test_low_and_medium_risk_tools_allowed(policy, tool, agent):
     d = policy.evaluate(tool, agent, "user", CUST)
@@ -16,8 +16,8 @@ def test_low_and_medium_risk_tools_allowed(policy, tool, agent):
     assert d.rule_id == "allow-low-medium-risk"
 
 
-@pytest.mark.parametrize("tool", ["reset_credentials", "update_security_settings", "issue_refund"])
-def test_high_risk_tools_require_approval(policy, tool):
+@pytest.mark.parametrize("tool", ["create_ticket", "reset_credentials", "update_security_settings", "issue_refund"])
+def test_every_action_requires_approval(policy, tool):
     d = policy.evaluate(tool, "action_ticket", "user", {**CUST, "amount": 10}, FOUND)
     assert d.effect == "require_approval"
     assert d.rule_id == "approval-required-tools"
@@ -33,7 +33,7 @@ def test_least_privilege_denies_tool_outside_agent_scope(policy):
     assert (d.effect, d.rule_id) == ("deny", "least-privilege")
 
 
-def test_role_permission_denies_viewer(policy):
+def test_removed_viewer_role_is_denied(policy):
     d = policy.evaluate("get_account_status", "access_check", "viewer", CUST)
     assert (d.effect, d.rule_id) == ("deny", "role-permission")
 
@@ -75,4 +75,14 @@ def test_account_actions_need_a_found_account(policy, tool, found):
 
 def test_ticket_creation_does_not_need_account_lookup(policy):
     d = policy.evaluate("create_ticket", "action_ticket", "user", CUST, {"account_found": None})
-    assert d.effect == "allow"
+    assert d.effect == "require_approval"  # approval yes, but not blocked by account-must-exist
+
+
+def test_escalation_ticket_allowed_without_approval(policy):
+    d = policy.evaluate("create_ticket", "action_ticket", "user", CUST, {"escalation": True})
+    assert (d.effect, d.rule_id) == ("allow", "escalation-ticket")
+
+
+def test_escalation_fact_does_not_unlock_other_actions(policy):
+    d = policy.evaluate("reset_credentials", "action_ticket", "user", CUST, {"escalation": True, **FOUND})
+    assert d.effect == "require_approval"

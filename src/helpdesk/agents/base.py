@@ -13,9 +13,10 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from dataclasses import dataclass
-from typing import Any
+from typing import Annotated, Any
 
 from langgraph.errors import GraphBubbleUp
+from pydantic import BeforeValidator
 
 from helpdesk.llm import LLMClient
 from helpdesk.state import HelpdeskState
@@ -23,6 +24,18 @@ from helpdesk.telemetry import set_attrs, span
 from helpdesk.tools.executor import CallContext, ToolExecutor
 
 NodeFn = Callable[[HelpdeskState, "Deps"], dict[str, Any]]
+
+
+def _as_list(value: Any) -> Any:
+    """LLMs sometimes return one string (or null) where a list is expected; accept it as a 1-item list."""
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    return value
+
+
+StrList = Annotated[list[str], BeforeValidator(_as_list)]
 
 
 @dataclass

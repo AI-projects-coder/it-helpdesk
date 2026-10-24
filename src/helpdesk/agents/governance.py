@@ -1,5 +1,6 @@
 """Orchestrator governance nodes: policy gate, human approval (HITL), escalation."""
 import time
+from dataclasses import replace
 
 from langgraph.types import interrupt
 from pydantic import ValidationError
@@ -8,6 +9,9 @@ from helpdesk.agents.base import Deps
 from helpdesk.state import HelpdeskState
 
 ACTION_AGENT = "action_ticket"
+
+# Argument problems the user can fix themselves: ask for the value instead of escalating.
+USER_SUPPLIED_FIELDS = {"customer_id", "amount"}
 
 
 def build_action_args(state: HelpdeskState) -> dict:
@@ -35,6 +39,10 @@ def policy_gate(state: HelpdeskState, deps: Deps) -> dict:
     try:
         deps.executor.tools.get(tool).input_model.model_validate(args)
     except ValidationError as e:
+        bad = {str(x["loc"][0]) for x in e.errors() if x["loc"]}
+        if bad and bad <= USER_SUPPLIED_FIELDS:
+            return {"pending_action": {"tool": tool, "args": args}, "policy_decision": None, "needs_approval": False,
+                    "missing_info": sorted(bad), "_decision": "needs_info:" + ",".join(sorted(bad))}
         reason = f"cannot run {tool}: " + "; ".join(f"{'.'.join(map(str, x['loc']))} {x['msg']}" for x in e.errors())
         return {"pending_action": {"tool": tool, "args": args}, "policy_decision": None, "needs_approval": False,
                 "escalation_reason": reason, "_decision": "invalid_action_args"}
@@ -93,7 +101,9 @@ def escalate(state: HelpdeskState, deps: Deps) -> dict:
             "issue_type": plan.get("issue_type", "other"),
             "priority": "high",
         }
-        r = deps.executor.execute("create_ticket", args, deps.ctx(state, ACTION_AGENT))
+        ctx = deps.ctx(state, ACTION_AGENT)
+        ctx = replace(ctx, facts={**ctx.facts, "escalation": True})  # policy rule escalation-ticket
+        r = deps.executor.execute("create_ticket", args, ctx)
         update["tool_results"] = [r.model_dump()]
         if r.ok:
             escalation["ticket_id"] = r.output["ticket_id"]

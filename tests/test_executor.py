@@ -14,12 +14,19 @@ TICKET_ARGS = {"customer_id": "CUST_05883", "summary": "Login fails", "issue_typ
 
 # --- against the real config ---
 
-def test_allowed_tool_runs(executor, action_ctx):
-    r = executor.execute("create_ticket", TICKET_ARGS, action_ctx)
+def test_ticket_needs_approval_then_runs(executor, action_ctx):
+    pending = executor.execute("create_ticket", TICKET_ARGS, action_ctx)
+    assert pending.status == "needs_approval" and pending.decision.rule_id == "approval-required-tools"
+    r = executor.execute("create_ticket", TICKET_ARGS, action_ctx, approved=True)
     assert r.ok
     assert r.output["ticket_id"].startswith("TKT-")
     assert r.attempts == 1
-    assert r.decision.effect == "allow"
+
+
+def test_escalation_ticket_runs_without_approval(executor):
+    ctx = CallContext(session_id="t", agent="action_ticket", facts={"escalation": True})
+    r = executor.execute("create_ticket", TICKET_ARGS, ctx)
+    assert r.ok and r.decision.rule_id == "escalation-ticket"
 
 
 def test_approval_required_blocks_without_approval(executor, action_ctx):
@@ -51,13 +58,13 @@ def test_wrong_agent_denied(executor):
 
 
 def test_invalid_input_rejected(executor, action_ctx):
-    r = executor.execute("create_ticket", {**TICKET_ARGS, "customer_id": "not-an-id"}, action_ctx)
+    r = executor.execute("create_ticket", {**TICKET_ARGS, "customer_id": "not-an-id"}, action_ctx, approved=True)
     assert r.status == "invalid_input"
     assert "customer_id" in r.error
 
 
 def test_extra_fields_rejected(executor, action_ctx):
-    r = executor.execute("create_ticket", {**TICKET_ARGS, "sudo": True}, action_ctx)
+    r = executor.execute("create_ticket", {**TICKET_ARGS, "sudo": True}, action_ctx, approved=True)
     assert r.status == "invalid_input"
 
 
@@ -82,9 +89,9 @@ def test_locked_account_from_scenario(executor):
 
 
 def test_ticket_ids_are_deterministic(executor, action_ctx):
-    a = executor.execute("create_ticket", TICKET_ARGS, action_ctx)
-    b = executor.execute("create_ticket", TICKET_ARGS, action_ctx)
-    c = executor.execute("create_ticket", {**TICKET_ARGS, "summary": "Something else"}, action_ctx)
+    a = executor.execute("create_ticket", TICKET_ARGS, action_ctx, approved=True)
+    b = executor.execute("create_ticket", TICKET_ARGS, action_ctx, approved=True)
+    c = executor.execute("create_ticket", {**TICKET_ARGS, "summary": "Something else"}, action_ctx, approved=True)
     assert a.output["ticket_id"] == b.output["ticket_id"] != c.output["ticket_id"]
 
 

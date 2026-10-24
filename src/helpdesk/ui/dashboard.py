@@ -4,6 +4,7 @@ Run with `helpdesk ui` (or `streamlit run streamlit_app.py`). Each chat message 
 one helpdesk session (turn) inside a conversation; the agents see a short summary of
 earlier turns. Conversations and pending approvals persist in SQLite (data/state/).
 """
+import re
 import threading
 import time
 
@@ -28,16 +29,6 @@ def get_app() -> HelpdeskApp:
     """One app per server process; LangGraph checkpoints live in it, so HITL can resume across reruns."""
     setup_tracing(get_settings().traces_dir / TRACE_FILE)
     return HelpdeskApp()
-
-
-@st.cache_data
-def golden_tickets() -> list[dict]:
-    return views.load_json(get_settings().golden_path) or []
-
-
-@st.cache_data
-def accounts() -> dict[str, dict]:
-    return views.load_json(get_settings().accounts_path) or {}
 
 
 def theme() -> str:
@@ -83,40 +74,23 @@ def open_conversation(conversation_id: str | None) -> None:
 
 # --- sidebar ---------------------------------------------------------------
 
-def sidebar() -> tuple[str | None, str, str | None]:
-    """Returns (customer_id, role, example query to send now)."""
-    s = get_settings()
+ROLES = ["user", "admin"]
+CUSTOMER_ID = re.compile(r"^CUST_\d{5}$")
+
+
+def sidebar() -> tuple[str | None, str]:
+    """Returns (customer_id, role)."""
     with st.sidebar:
         st.header("Requester")
-        accts = accounts()
-        options = ["(none)"] + sorted(accts)
-
-        def label(cid: str) -> str:
-            if cid == "(none)":
-                return "No customer id"
-            a = accts[cid]
-            return f"{cid} · {a['sla_plan']} · {a['account_status']}"
-
-        customer = st.selectbox("Customer", options, format_func=label, key="customer")
-        role = st.radio("Role", ["user", "viewer", "admin"], horizontal=True, key="role",
-                        help="viewer can only search the KB; admin is still subject to HITL")
-
-        st.header("Try a golden ticket")
-        tickets = golden_tickets()
-        idx = st.selectbox(
-            "Example", range(len(tickets)), key="example",
-            format_func=lambda i: f"{tickets[i]['issue_type']} · {tickets[i]['initial_message'][:48]}",
-        )
-        example = None
-        if st.button("Send example", width="stretch"):
-            example = tickets[idx]["initial_message"]
-            st.session_state["example_customer"] = tickets[idx]["customer_id"]
-
+        role = st.radio("Role", ROLES, horizontal=True, key="role",
+                        help="user: chat only · admin: chat, traces, evaluation and registry")
+        raw = st.text_input("Customer ID (optional)", key="customer", placeholder="e.g. CUST_02280",
+                            help="Needed for account checks and account actions such as a password reset")
+        customer = raw.strip().upper() or None
+        if customer and not CUSTOMER_ID.match(customer):
+            st.warning("Customer IDs look like CUST_12345", icon="⚠️")
         conversations_panel()
-        st.divider()
-        st.caption(f"LLM: `{s.llm_provider}/{s.llm_model}` · judge `{s.judge_model}` · KB top-k {s.kb_top_k}")
-
-    return (None if customer == "(none)" else customer), role, example
+    return customer, role
 
 
 def conversations_panel() -> None:
@@ -137,26 +111,6 @@ def conversations_panel() -> None:
 
 # --- chat ------------------------------------------------------------------
 
-def render_details(state: dict) -> None:
-    with st.expander("How this was handled", expanded=False):
-        plan = state.get("plan") or {}
-        if plan:
-            st.markdown(f"**Plan** · `{plan.get('issue_type')}` · urgency `{plan.get('urgency')}`  \n"
-                        + " → ".join(plan.get("steps", [])))
-        st.markdown("**Agent flow**")
-        st.dataframe(views.events_frame(state), hide_index=True, width="stretch")
-        tools = views.tools_frame(state)
-        if not tools.empty:
-            st.markdown("**Tool calls** (every call passes the policy engine)")
-            st.dataframe(tools, hide_index=True, width="stretch")
-        refl = state.get("reflection")
-        if refl:
-            verdict = "grounded ✅" if refl["grounded"] else f"not grounded ⚠️ — {refl['feedback']}"
-            st.markdown(f"**Reflection** ({state.get('reflection_attempts', 1)} review(s)): {verdict}")
-        if state.get("errors"):
-            st.error("\n".join(state["errors"]))
-
-
 def render_turn(i: int, turn: dict) -> None:
     with st.chat_message("user"):
         who = turn["customer_id"] or "anonymous"
@@ -169,17 +123,7 @@ def render_turn(i: int, turn: dict) -> None:
         if result.status == "awaiting_approval":
             render_approval(i, turn)
             return
-        icon, text = views.OUTCOME_BADGES.get(state.get("outcome"), ("•", state.get("outcome")))
-        st.markdown(state.get("final_response", ""))
-        cols = st.columns([2, 2, 3])
-        cols[0].caption(f"{icon} {text}")
-        history = len(state.get("history") or [])
-        context = f" · used {history} earlier turn(s)" if history else ""
-        cols[1].caption(f"issue `{(state.get('plan') or {}).get('issue_type', '-')}`{context}")
-        if cols[2].button(f"Trace {result.session_id}", key=f"trace_{i}", type="tertiary"):
-            st.session_state.trace_session = result.session_id
-            st.toast("Open the Traces tab to see this session")
-        render_details(state)
+        st.markdown(state.get("final_response", ""))  # answer only; details live in the admin Traces tab
 
 
 def render_approval(i: int, turn: dict) -> None:
@@ -197,14 +141,10 @@ def render_approval(i: int, turn: dict) -> None:
             turn["result"] = get_app().resume(result.session_id, approved=approve, approver="dashboard-user",
                                               comment=comment)
         st.rerun()
-    render_details(result.state)
 
 
-def chat_tab(customer_id: str | None, role: str, example: str | None) -> None:
+def chat_tab(customer_id: str | None, role: str) -> None:
     turns = st.session_state.turns
-    if not turns:
-        st.info("Describe an IT problem, or send a golden ticket from the sidebar. Pick a customer to enable "
-                "account checks and actions. Try *“My account is locked”* with **CUST_02280** to see approval.")
     for i, turn in enumerate(turns):
         render_turn(i, turn)
 
@@ -213,14 +153,8 @@ def chat_tab(customer_id: str | None, role: str, example: str | None) -> None:
         st.caption(f"ℹ️ Earlier turns were for {first_customer or 'no customer'}; their context is only shared "
                    "with the same customer. Start a new conversation for a different customer.")
     pending = any(t["result"].status == "awaiting_approval" for t in turns)
-    typed = st.chat_input("Describe your issue…", disabled=pending)
-    query = typed or example
-    if pending and example:
-        st.toast("Approve or reject the pending action first")
-        return
+    query = st.chat_input("Describe your issue…", disabled=pending)
     if query:
-        if example:
-            customer_id = st.session_state.pop("example_customer", customer_id)
         with st.spinner("Agents working…"):
             result = get_app().start(query, customer_id=customer_id, role=role,
                                      conversation_id=st.session_state.conversation_id)
@@ -335,9 +269,8 @@ def eval_tab() -> None:
         return
 
     cur = latest["summary"]
-    st.caption(f"Run `{latest['run_id']}` · {cur['tickets']} tickets · model `{latest['config']['llm_model']}` · "
-               f"judge `{latest['config']['judge_model']}` (prompt v{latest['config']['judge_prompt_version']})"
-               + (f" · baseline `{base['run_id']}`" if base else " · no baseline"))
+    st.caption(f"Run {latest['run_id']} · {cur['tickets']} tickets"
+               + (f" · baseline {base['run_id']}" if base else " · no baseline"))
 
     cols = st.columns(len(METRICS) + 2)
     for col, (key, name) in zip(cols, METRICS, strict=False):  # extra cols hold latency/tokens
@@ -421,12 +354,15 @@ def main() -> None:
     if problem := api_key_problem():
         st.error(problem, icon="🔑")
         st.stop()
-    customer_id, role, example = sidebar()
+    customer_id, role = sidebar()
     st.title("IT Helpdesk")
     st.caption("Multi-agent helpdesk · LangGraph · OpenTelemetry · policy-gated tools with human approval")
+    if role != "admin":  # user: chat only
+        chat_tab(customer_id, role)
+        return
     chat, traces, evals, registry = st.tabs(["💬 Chat", "🔭 Traces", "📊 Evaluation", "🗂️ Registry"])
     with chat:
-        chat_tab(customer_id, role, example)
+        chat_tab(customer_id, role)
     with traces:
         traces_tab()
     with evals:

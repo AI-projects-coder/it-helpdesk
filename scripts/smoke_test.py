@@ -38,10 +38,14 @@ SCENARIOS = [
     Scenario("how_to", "How do I export my data to CSV?",
              check=lambda r, f: expect(r.state["outcome"] == "resolved", f"outcome {r.state['outcome']}")
              + expect("access_check" not in f, "account looked up without customer")),
-    Scenario("bug_ticket", "The app crashes whenever I open the analytics dashboard", CUSTOMER,
+    Scenario("bug_ticket", "The app crashes whenever I open the analytics dashboard", CUSTOMER, approve=True,
              check=lambda r, f: expect(r.state["outcome"] in ("ticket_created", "escalated"),
                                        f"outcome {r.state['outcome']}")
+             + expect(r.state["outcome"] != "ticket_created" or "human_approval" in f, "ticket without approval")
              + expect("access_check" not in f, "unneeded account lookup")),
+    Scenario("off_topic", "What is the capital of France?",
+             check=lambda r, f: expect(r.state["outcome"] == "out_of_scope", f"outcome {r.state['outcome']}")
+             + expect("knowledge_search" not in f, "KB searched for an unrelated question")),
     Scenario("hitl_approve", "My account is locked after too many login attempts", LOCKED, approve=True,
              check=lambda r, f: expect("human_approval" in f, "no HITL step")
              + expect(tools(r).get("reset_credentials") == "ok", "reset not executed")),
@@ -51,9 +55,9 @@ SCENARIOS = [
     Scenario("refund_over_limit", "I was charged twice, please refund the extra 900 dollars", CUSTOMER, approve=True,
              check=lambda r, f: expect("issue_refund" not in tools(r), "refund over limit executed")
              + expect(r.state["outcome"] == "escalated", f"outcome {r.state['outcome']}")),
-    Scenario("viewer_denied", "The app crashes whenever I open the analytics dashboard", CUSTOMER, role="viewer",
-             check=lambda r, f: expect("create_ticket" not in {k for k, v in tools(r).items() if v == "ok"}
-                                       or r.state["outcome"] == "escalated", "viewer created a ticket")),
+    Scenario("removed_role_denied", "The app crashes whenever I open the analytics dashboard", CUSTOMER,
+             role="viewer",
+             check=lambda r, f: expect(r.state["outcome"] == "escalated", f"outcome {r.state['outcome']}")),
     Scenario("pii_redaction", "How do I set up the API? Reach me at jane.doe@corp.com or +1 415-555-0134",
              check=lambda r, f: expect("jane.doe@corp.com" not in r.state["query"], "email not redacted")
              + expect("555-0134" not in r.state["query"], "phone not redacted")),
@@ -67,7 +71,7 @@ SCENARIOS = [
     Scenario("malformed_customer", "My account is locked", "not-a-customer-id", approve=True,
              check=lambda r, f: expect(r.state.get("outcome") is not None, "no outcome")
              + expect(tools(r).get("reset_credentials") != "ok", "reset ran with invalid customer id")),
-    Scenario("oversized_input", "My dashboard is slow. " + "x" * 2500, CUSTOMER,
+    Scenario("oversized_input", "My dashboard is slow. " + "x" * 2500, CUSTOMER, approve=True,
              check=lambda r, f: expect(r.state.get("final_response"), "no response")),
 ]
 

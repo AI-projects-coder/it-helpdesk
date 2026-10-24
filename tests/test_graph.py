@@ -77,14 +77,40 @@ def test_account_check_runs_with_customer_id(make_app):
     assert "ACCOUNT STATUS" in reasoning_prompt and CUSTOMER in reasoning_prompt
 
 
-def test_bug_creates_ticket_without_approval(make_app):
+def test_bug_ticket_requires_approval(make_app):
     app, _ = make_app({"planner": plan("bug"), "reasoning": draft("create_ticket", cited=["KB_BUG"]),
                        "reflection": GROUNDED})
-    r = app.start("The app crashes", customer_id=CUSTOMER)
-    assert r.status == "completed"
+    paused = app.start("The app crashes", customer_id=CUSTOMER)
+    assert paused.status == "awaiting_approval" and paused.interrupt["tool"] == "create_ticket"
+    r = app.resume(paused.session_id, approved=True)
     assert r.state["outcome"] == "ticket_created"
     assert r.state["action_result"]["ticket_id"].startswith("TKT-")
-    assert "human_approval" not in flow(r)
+    assert "human_approval" in flow(r)
+
+
+def test_rejected_ticket_still_escalates_with_handoff_ticket(make_app):
+    app, _ = make_app({"planner": plan("bug"), "reasoning": draft("create_ticket", cited=["KB_BUG"]),
+                       "reflection": GROUNDED})
+    paused = app.start("The app crashes", customer_id=CUSTOMER)
+    r = app.resume(paused.session_id, approved=False)
+    assert r.status == "completed" and r.state["outcome"] == "escalated"
+    assert r.state["escalation"]["ticket_id"]  # hand-off ticket needed no second approval
+
+
+def test_it_request_always_searches_kb_even_if_llm_says_no(make_app):
+    app, _ = make_app({"planner": {**plan(), "needs_kb": False}, "reasoning": draft(), "reflection": GROUNDED})
+    r = app.start("How do I export my data?")
+    assert "knowledge_search" in flow(r)
+
+
+def test_off_topic_question_skips_agents(make_app):
+    app, llm = make_app({"planner": {**plan(), "in_scope": False}})
+    r = app.start("What's the weather in Paris?", customer_id=CUSTOMER)
+    assert flow(r) == ["intake", "planner", "respond"]
+    assert r.state["outcome"] == "out_of_scope"
+    assert r.state["final_response"] == "Sorry, I can only help with IT support questions."
+    assert r.state["tool_results"] == []
+    assert [n for n, _ in llm.calls] == ["planner"]
 
 
 # --- HITL ---
@@ -146,13 +172,40 @@ def test_refund_over_limit_denied_and_escalated(make_app):
     assert "issue_refund" not in [t for t, _ in tools_called(r)]
 
 
-def test_refund_without_amount_escalates_before_approval(make_app):
+def test_refund_without_amount_asks_for_it(make_app):
     app, _ = make_app({"planner": plan("billing_problem"),
                        "reasoning": draft("issue_refund", cited=["KB_HOW_TO"]), "reflection": GROUNDED})
     r = app.start("I was double charged", customer_id=CUSTOMER)
     assert r.status == "completed"
-    assert "human_approval" not in flow(r)
-    assert "amount" in r.state["escalation"]["reason"]
+    assert "human_approval" not in flow(r)  # never shown to an approver without an amount
+    assert r.state["outcome"] == "needs_info" and r.state["missing_info"] == ["amount"]
+    assert "refund amount" in r.state["final_response"]
+    assert not r.state.get("escalation")
+
+
+def test_action_without_customer_id_asks_for_it(make_app):
+    app, _ = make_app({"planner": plan("account_access", needs_account=True),
+                       "reasoning": draft("reset_credentials", cited=["KB_ACCOUNT_ACCESS"]), "reflection": GROUNDED})
+    r = app.start("I forgot my password")  # anonymous
+    assert r.state["outcome"] == "needs_info" and r.state["missing_info"] == ["customer_id"]
+    assert r.state["final_response"].startswith("To reset your password I need your Customer ID")
+    assert "Here is what to do next." not in r.state["final_response"]  # no "I will reset..." promise
+    assert "reset_credentials" not in tools_called(r)
+
+
+def test_missing_customer_and_amount_both_requested(make_app):
+    app, _ = make_app({"planner": plan("billing_problem"),
+                       "reasoning": draft("issue_refund", cited=["KB_HOW_TO"]), "reflection": GROUNDED})
+    r = app.start("provide my refund")
+    assert r.state["missing_info"] == ["amount", "customer_id"]
+    assert "Customer ID" in r.state["final_response"] and "refund amount" in r.state["final_response"]
+
+
+def test_with_customer_id_the_same_request_reaches_approval(make_app):
+    app, _ = make_app({"planner": plan("account_access", needs_account=True),
+                       "reasoning": draft("reset_credentials", cited=["KB_ACCOUNT_ACCESS"]), "reflection": GROUNDED})
+    r = app.start("I forgot my password", customer_id=CUSTOMER)
+    assert r.status == "awaiting_approval" and r.interrupt["tool"] == "reset_credentials"
 
 
 def test_action_on_unknown_account_denied_even_with_approval(make_app):
@@ -164,11 +217,14 @@ def test_action_on_unknown_account_denied_even_with_approval(make_app):
     assert "reset_credentials" not in [t for t, _ in tools_called(r)]
 
 
-def test_viewer_role_cannot_run_actions(make_app):
+def test_unknown_role_cannot_run_actions(make_app):
     app, _ = make_app({"planner": plan("bug"), "reasoning": draft("create_ticket", cited=["KB_BUG"]),
                        "reflection": GROUNDED})
-    r = app.start("The app crashes", customer_id=CUSTOMER, role="viewer")
-    assert r.state["policy_decision"]["rule_id"] == "role-permission"
+    r = app.start("The app crashes", customer_id=CUSTOMER, role="viewer")  # viewer was removed
+    search = next(t for t in r.state["tool_results"] if t["tool"] == "search_kb")
+    assert (search["status"], search["decision"]["rule_id"]) == ("denied", "role-permission")
+    tickets = [t for t in r.state["tool_results"] if t["tool"] == "create_ticket" and t["status"] == "ok"]
+    assert all(t["decision"]["rule_id"] == "escalation-ticket" for t in tickets)  # only the hand-off ticket
     assert r.state["outcome"] == "escalated"
 
 
@@ -232,7 +288,9 @@ def test_pii_redacted_before_llm_and_storage(make_app):
 def test_session_capture(make_app):
     app, _ = make_app({"planner": plan("bug"), "reasoning": draft("create_ticket", cited=["KB_BUG"]),
                        "reflection": GROUNDED})
-    r = app.start("The app crashes", customer_id=CUSTOMER)
+    paused = app.start("The app crashes", customer_id=CUSTOMER)
+    assert app.store.load(paused.session_id)["status"] == "awaiting_approval"
+    r = app.resume(paused.session_id, approved=True)
     saved = app.store.load(r.session_id)
     assert saved["status"] == "completed"
     assert [t["tool"] for t in saved["tool_results"]] == ["search_kb", "create_ticket"]

@@ -31,7 +31,7 @@ tools:
     input_schema: CreateTicketInput
     output_schema: CreateTicketOutput
     risk: medium
-    approval_required: false
+    approval_required: true   # every agent-proposed action is human-approved
     timeout_s: 5
 
   - name: reset_credentials

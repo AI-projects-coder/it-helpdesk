@@ -6,7 +6,7 @@ retrieved), then an LLM judgment of whether the claims are supported.
 
 from pydantic import BaseModel
 
-from helpdesk.agents.base import Deps, format_context, format_history, latest_tool_output
+from helpdesk.agents.base import Deps, StrList, format_context, format_history, latest_tool_output
 from helpdesk.state import HelpdeskState
 
 SYSTEM = """You review a helpdesk draft for groundedness. Given the user's REQUEST, the tool
@@ -31,7 +31,7 @@ If not grounded, list the unsupported claims and give one sentence of feedback."
 
 class Reflection(BaseModel):
     grounded: bool
-    unsupported_claims: list[str]
+    unsupported_claims: StrList
     feedback: str
 
 

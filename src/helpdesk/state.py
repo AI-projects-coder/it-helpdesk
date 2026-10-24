@@ -13,7 +13,7 @@ IssueType = Literal[
 
 ActionName = Literal["none", "create_ticket", "reset_credentials", "update_security_settings", "issue_refund"]
 
-Outcome = Literal["resolved", "action_completed", "ticket_created", "escalated"]
+Outcome = Literal["resolved", "action_completed", "ticket_created", "escalated", "out_of_scope", "needs_info"]
 
 
 class HelpdeskState(TypedDict, total=False):
@@ -48,6 +48,7 @@ class HelpdeskState(TypedDict, total=False):
     pending_action: dict[str, Any] | None  # {"tool": ..., "args": {...}}
     policy_decision: dict[str, Any] | None
     needs_approval: bool
+    missing_info: list[str] | None         # action blocked only by user-suppliable fields (customer_id, amount)
     approval: dict[str, Any] | None        # {"approved": bool, "approver": str, "comment": str}
 
     action_result: dict[str, Any] | None

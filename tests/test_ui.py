@@ -40,17 +40,6 @@ def test_trace_stats():
     assert views.trace_stats(views.spans_frame([]))["spans"] == 0
 
 
-def test_state_frames():
-    state = {
-        "events": [{"agent": "planner", "decision": "issue_type=bug", "latency_ms": 5.0}],
-        "tool_results": [{"tool": "create_ticket", "status": "ok", "args": {"a": 1}, "output": {"ticket_id": "T"},
-                          "decision": {"effect": "allow", "rule_id": "r"}, "attempts": 1, "latency_ms": 1.0}],
-    }
-    assert views.events_frame(state).iloc[0]["agent"] == "planner"
-    row = views.tools_frame(state).iloc[0]
-    assert (row["tool"], row["policy"], row["output"]) == ("create_ticket", "allow", '{"ticket_id": "T"}')
-
-
 def test_recent_sessions(tmp_path):
     (tmp_path / "x.json").write_text(json.dumps({"session_id": "x", "status": "completed", "outcome": "resolved",
                                                  "query": "q"}))
@@ -91,20 +80,49 @@ def texts(at) -> str:
     return "\n".join(m.value for m in at.markdown)
 
 
-def test_dashboard_renders_all_tabs(ui):
+def test_new_conversation_has_no_intro_message(ui):
+    assert not ui.info
+    assert "golden ticket" not in texts(ui).lower()
+
+
+def test_user_role_sees_chat_only(ui):
+    assert ui.radio(key="role").value == "user"
+    assert not ui.tabs  # no Traces / Evaluation / Registry
+    assert ui.chat_input
+    assert "AI registry" not in texts(ui)
+
+
+def test_admin_role_sees_all_tabs(ui):
+    ui.radio(key="role").set_value("admin").run()
     assert [t.label for t in ui.tabs] == ["💬 Chat", "🔭 Traces", "📊 Evaluation", "🗂️ Registry"]
     assert "AI registry" in texts(ui)
+
+
+def test_sidebar_has_no_dropdowns_examples_or_model_info(ui):
+    assert ui.radio(key="role").options == ["user", "admin"]
+    assert not ui.selectbox  # customer dropdown and golden-ticket examples removed
+    labels = [b.label for b in ui.button]
+    assert "Send example" not in labels
+    captions = " ".join(c.value for c in ui.caption).lower()
+    assert "judge" not in captions and "top-k" not in captions and "gpt" not in captions
+
+
+def test_customer_id_format_warning(ui):
+    ui.text_input(key="customer").input("bob").run()
+    assert any("CUST_12345" in w.value for w in ui.warning)
 
 
 def test_chat_resolves_simple_question(ui):
     ui.chat_input[0].set_value("How do I export my data?").run()
     assert not ui.exception
     assert "Here is what to do next." in texts(ui)
-    assert any("Resolved" in c.value for c in ui.caption)
+    assert not ui.expander  # answer only: no "How this was handled" details
+    assert not [b for b in ui.button if b.label.startswith("Trace ")]
+    assert not any("Resolved" in c.value or "issue" in c.value for c in ui.caption)
 
 
 def test_chat_hitl_approve(ui):
-    ui.selectbox(key="customer").set_value(CUSTOMER).run()
+    ui.text_input(key="customer").input(CUSTOMER).run()
     ui.chat_input[0].set_value("I am locked out of my account").run()
     assert any("Approval required" in w.value for w in ui.warning)
     assert ui.chat_input[0].disabled  # no new questions while an action waits for a human
@@ -116,7 +134,7 @@ def test_chat_hitl_approve(ui):
 
 
 def test_chat_hitl_reject_escalates(ui):
-    ui.selectbox(key="customer").set_value(CUSTOMER).run()
+    ui.text_input(key="customer").input(CUSTOMER).run()
     ui.chat_input[0].set_value("I am locked out of my account").run()
     ui.text_input(key="comment_0").input("verify identity first")
     ui.button(key="reject_0").click().run()
@@ -148,4 +166,4 @@ def test_conversation_list_reopen_and_url(ui):
 def test_follow_up_in_ui_uses_history(ui):
     ui.chat_input[0].set_value("How do I export my data?").run()
     ui.chat_input[0].set_value("It still does not work").run()
-    assert any("used 1 earlier turn" in c.value for c in ui.caption)
+    assert len(ui.session_state["turns"][1]["result"].state["history"]) == 1  # context used, just not displayed

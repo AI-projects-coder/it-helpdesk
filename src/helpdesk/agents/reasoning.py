@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from helpdesk.agents.base import Deps, format_context, format_history
+from helpdesk.agents.base import Deps, StrList, format_context, format_history
 from helpdesk.state import ActionName, HelpdeskState
 
 SYSTEM = """You are the reasoning agent of an IT helpdesk. Using ONLY the context provided
@@ -35,7 +35,7 @@ Do not state facts that are not in the context."""
 class Draft(BaseModel):
     resolution_summary: str
     customer_reply: str
-    cited_articles: list[str]
+    cited_articles: StrList
     action: ActionName
     action_reason: str = Field(description="Why this action, in one sentence")
     refund_amount: float | None = Field(

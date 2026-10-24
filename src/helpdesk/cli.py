@@ -24,7 +24,7 @@ def cli(otel_console: bool) -> None:
 @cli.command()
 @click.argument("text")
 @click.option("--customer-id", help="e.g. CUST_05883 (enables account check and actions)")
-@click.option("--role", default="user", type=click.Choice(["viewer", "user", "admin"]), show_default=True)
+@click.option("--role", default="user", type=click.Choice(["user", "admin"]), show_default=True)
 @click.option("--conversation", "conversation_id", help="Continue this conversation (agents see earlier turns).")
 @click.option("--approve/--reject", "decision", default=None, help="Answer HITL non-interactively.")
 @click.option("--defer", is_flag=True, help="Leave a HITL approval pending; decide later with `helpdesk resume`.")
@@ -247,7 +247,8 @@ def _print_run(state: dict) -> None:
         for err in state["errors"]:
             click.echo(f"  {err}")
 
-    color = {"resolved": "green", "action_completed": "green", "ticket_created": "cyan", "escalated": "yellow"}
+    color = {"resolved": "green", "action_completed": "green", "ticket_created": "cyan", "escalated": "yellow",
+             "out_of_scope": "magenta", "needs_info": "yellow"}
     outcome = state.get("outcome", "unknown")
     click.secho(f"\nOutcome: {outcome}", bold=True, fg=color.get(outcome))
     if state.get("draft"):

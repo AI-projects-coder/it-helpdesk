@@ -3,10 +3,17 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from helpdesk.agents.base import Deps, format_history
+from helpdesk.agents.base import Deps, StrList, format_history
 from helpdesk.state import HelpdeskState, IssueType
 
 SYSTEM = """You are the planning agent of an IT helpdesk. Classify the user's request and plan the work.
+
+First decide in_scope: true for anything about using this product or IT support: login, the user's
+account or workspace, billing, security, errors, performance, how-to, feature requests, and vague
+requests for help ("I have a general question about my account", "something seems off").
+false only for requests clearly unrelated to IT support (general knowledge, weather, jokes, recipes,
+homework, small talk such as "hi"). When unsure, choose true. If in_scope is false, the other fields
+don't matter.
 
 Issue types:
 - account_access: cannot log in, password rejected, account locked, 2FA problems
@@ -32,12 +39,13 @@ ACCOUNT_ISSUE_TYPES = {"account_access", "security_concern", "billing_problem"}
 
 
 class Plan(BaseModel):
+    in_scope: bool = Field(default=True, description="Is this an IT support request?")
     issue_type: IssueType
     summary: str = Field(description="One-sentence restatement of the problem")
     urgency: Literal["low", "medium", "high", "urgent"]
     needs_kb: bool = Field(default=True, description="Search the knowledge base")
     needs_account_check: bool
-    steps: list[str] = Field(description="2-4 short planned steps")
+    steps: StrList = Field(description="2-4 short planned steps")
 
 
 def planner(state: HelpdeskState, deps: Deps) -> dict:
@@ -45,7 +53,11 @@ def planner(state: HelpdeskState, deps: Deps) -> dict:
     if history := format_history(state):
         user = f"{history}\n\n{user}"
     plan = deps.llm.structured(Plan, SYSTEM, user, name="planner").parsed
+    # the KB is used exactly when it is needed: every IT request (it holds the resolutions), never off-topic
+    plan.needs_kb = plan.in_scope
     plan.needs_account_check = (
         plan.needs_account_check and plan.issue_type in ACCOUNT_ISSUE_TYPES and bool(state.get("customer_id"))
     )
+    if not plan.in_scope:
+        return {"plan": plan.model_dump(), "_decision": "out_of_scope"}
     return {"plan": plan.model_dump(), "_decision": f"issue_type={plan.issue_type}"}

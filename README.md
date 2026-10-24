@@ -37,10 +37,11 @@ helpdesk ui                        # dashboard at http://localhost:8501
 | Do | Expect |
 |---|---|
 | *"How do I export my data to CSV?"* | Resolved from the KB, no action |
-| Customer **CUST_02280** (locked) + *"My account is locked"* | ⏸️ Approval card for `reset_credentials` → Approve / Reject |
+| Customer ID **CUST_02280** (locked) + *"My account is locked"* | ⏸️ Approval card for `reset_credentials` → Approve / Reject |
+| Customer ID **CUST_05883** + *"The app crashes on the analytics dashboard"* | ⏸️ Approval card for `create_ticket`: **every action is approved** |
+| *"What is the capital of France?"* | 🚫 *"Sorry, I can only help with IT support questions."*: no KB search, no agents |
 | *"Please refund the extra 900 dollars"* | Denied by policy rule `refund-limit` → escalated |
-| Role **viewer** + a bug report | Denied by `role-permission` → escalated |
-| Sidebar → **Send example** | Runs any of the 50 golden tickets |
+| Role **user** → **admin** | user sees only Chat; admin also gets Traces, Evaluation and Registry |
 | After an answer, ask a follow-up (*"it still doesn't work"*) | Caption shows *used 1 earlier turn(s)*; the reply builds on the earlier resolution |
 | ➕ **New conversation**, then click an old one in the sidebar | Old conversation reopens, including a pending approval (⏸) you can still decide |
 | Refresh the page | The current conversation reopens (its id is in the URL, `?c=…`) |
@@ -51,8 +52,8 @@ helpdesk ui                        # dashboard at http://localhost:8501
 
 | Workflow | When | What | Cost |
 |---|---|---|---|
-| [`ci.yml`](.github/workflows/ci.yml) | every push to `main`, every PR | `ruff` lint, 129 tests (fake LLM), Docker build + boot/non-root/no-secret checks | free, no API key |
-| [`live-eval.yml`](.github/workflows/live-eval.yml) | manual (Actions → *Live eval* → Run) | 11 live smoke scenarios + 50-ticket eval vs `data/eval/baseline.json`; fails on regression; uploads results | ~$0.05, needs `OPENAI_API_KEY` secret |
+| [`ci.yml`](.github/workflows/ci.yml) | every push to `main`, every PR | `ruff` lint, 141 tests (fake LLM), Docker build + boot/non-root/no-secret checks | free, no API key |
+| [`live-eval.yml`](.github/workflows/live-eval.yml) | manual (Actions → *Live eval* → Run) | 12 live smoke scenarios + 50-ticket eval vs `data/eval/baseline.json`; fails on regression; uploads results | ~$0.05, needs `OPENAI_API_KEY` secret |
 
 ## Docker
 
@@ -62,7 +63,7 @@ One image serves the dashboard and the CLI. It runs as a non-root user, and no s
 docker compose up --build -d                     # dashboard at http://localhost:8080 (reads .env)
 docker compose run --rm helpdesk query "How do I export my data?"
 docker compose run --rm helpdesk eval --limit 5
-docker compose run --rm helpdesk smoke           # 11 live scenarios inside the container
+docker compose run --rm helpdesk smoke           # 12 live scenarios inside the container
 docker compose down                              # add -v to also delete the data volume
 ```
 
@@ -79,7 +80,7 @@ Everything the app writes (KB index, sessions, traces, conversations, checkpoint
 | Image | Artifact Registry `asia-south1-docker.pkg.dev/hcl-it-desk/it-helpdesk/app:<git-sha>`, built by Cloud Build ([cloudbuild.yaml](cloudbuild.yaml)) as SA `helpdesk-build` (source read, registry write, logs) |
 | Secret | Secret Manager `openai-api-key`, injected as `OPENAI_API_KEY`; readable only by the runtime SA |
 | Service | Cloud Run `it-helpdesk`: SA `helpdesk-run`, 2 GiB / 1 vCPU, **max 1 instance**, session affinity, 3600 s timeout, scales to zero |
-| Post-deploy check | Cloud Run Job `helpdesk-smoke` runs the 11 live scenarios with the same image and secret |
+| Post-deploy check | Cloud Run Job `helpdesk-smoke` runs the 12 live scenarios with the same image and secret |
 
 ```bash
 P=hcl-it-desk R=asia-south1 IMG=$R-docker.pkg.dev/$P/it-helpdesk/app TAG=$(git rev-parse --short HEAD)
@@ -104,7 +105,7 @@ Teardown: `gcloud run services delete it-helpdesk`, `gcloud run jobs delete help
 
 ```bash
 helpdesk query "My account is locked" --customer-id CUST_02280   # prompts for approval
-helpdesk query "..." --approve | --reject | --role viewer | --no-trace
+helpdesk query "..." --approve | --reject | --role admin | --no-trace
 helpdesk query "It still fails" --customer-id CUST_02280 --conversation <conversation_id>   # follow-up turn
 helpdesk query "My account is locked" --customer-id CUST_02280 --defer   # leave approval pending
 helpdesk resume <session_id> --approve|--reject [--comment "..."]          # decide later, any process
@@ -119,9 +120,9 @@ helpdesk ui [--port 8501] [--host 0.0.0.0] [--headless]
 ## Tests
 
 ```bash
-pytest                          # 129 unit/graph/UI tests, scripted fake LLM, no API calls (~5 s)
+pytest                          # 141 unit/graph/UI tests, scripted fake LLM, no API calls (~5 s)
 pytest -m integration           # live Chroma + OpenAI embedding check
-python scripts/smoke_test.py    # 11 live end-to-end scenarios incl. prompt injection (~1 min)
+python scripts/smoke_test.py    # 12 live end-to-end scenarios incl. prompt injection, off-topic (~1 min)
 ruff check .
 ```
 
@@ -132,7 +133,8 @@ ruff check .
 ```mermaid
 flowchart TD
     START([user query]) --> intake[intake<br/>redact PII]
-    intake --> planner[planner · LLM<br/>classify + plan]
+    intake --> planner[planner · LLM<br/>in scope? classify + plan]
+    planner -. not IT support .-> respond
     planner --> kb[knowledge_search<br/>tool: search_kb]
     planner -. no KB .-> access
     kb --> access[access_check<br/>tool: get_account_status]
@@ -163,6 +165,14 @@ A **conversation** is an ordered list of **turns**, and each turn is one graph r
 - **Persistence.** LangGraph checkpoints (`SqliteSaver`) and the conversation index live in `data/state/*.sqlite`. A pending approval survives a restart and can be resumed from another process (`helpdesk resume`) or from the dashboard. In production these would move to Postgres / Cloud SQL (or Firestore for the index); the stores are isolated classes for that reason.
 - **Scope.** Eval and smoke runs use `track_conversation=False`, so they don't fill the conversation list. There is no login yet: every dashboard user sees all conversations (fine for a single-user demo; real users need auth + per-user scoping).
 
+### Roles, scope and approvals
+
+- **Roles.** `user` sees only the chat; `admin` also sees Traces, Evaluation and Registry. The role is chosen in the sidebar (there is no login, so this is a demo control, not security).
+- **Every action needs approval.** Any action an agent proposes (create a ticket, reset credentials, change security settings, refund) pauses for Approve/Reject in the chat. Plain answers (e.g. how-to) are sent directly. Only the escalation hand-off ticket runs without approval.
+- **Off-topic questions.** The planner decides whether a request is IT support. If not, the graph goes straight to the reply *"Sorry, I can only help with IT support questions."* (no KB search, no other agents). Every IT request always searches the KB.
+- **Customer ID.** An optional sidebar field (format `CUST_12345`), needed for account checks and for every action. If an action is blocked only by something the user can supply (Customer ID, refund amount), the assistant asks for it, e.g. *"To reset your password I need your Customer ID…"*, instead of escalating. With it, the request goes to the approval card.
+- **LLM output robustness.** List fields accept a single string, and unparseable structured output is retried once before the node fails.
+
 ### Agents (AI registry: `config/agents.yaml`)
 
 | Agent | Role | Allowed tools |
@@ -186,14 +196,15 @@ The LLM chooses *which* action, but **tool arguments are built in code** from st
 
 1. The tool is registered. Otherwise **deny**.
 2. The tool is in the agent's `allowed_tools` (least privilege). Otherwise **deny**.
-3. The tool is permitted for the requester's role (`viewer` / `user` / `admin`). Otherwise **deny**.
+3. The tool is permitted for the requester's role (`user` / `admin`; anything else is denied). Otherwise **deny**.
 4. Then the rules, first match wins:
 
 | Rule | Effect |
 |---|---|
 | `account-must-exist`: account-changing action without a verified account lookup | deny |
 | `refund-limit`: refund > 500 | deny (even with approval) |
-| `approval-required-tools`: tool flagged `approval_required` | **HITL** |
+| `escalation-ticket`: the system's hand-off ticket when a case is escalated | allow (no second approval) |
+| `approval-required-tools`: tool flagged `approval_required`, i.e. **every action** (`create_ticket`, reset, security change, refund) | **HITL** |
 | `allow-low-medium-risk` | allow |
 | *(no match)* | deny by default |
 
@@ -273,7 +284,7 @@ src/helpdesk/
   llm.py           provider factory + LLMClient protocol
   cli.py           click CLI
   ui/              dashboard (Streamlit) · views (pure data shaping)
-tests/             116 tests; fakes.py holds the scripted LLM
+tests/             141 tests; fakes.py holds the scripted LLM
 ```
 
 ## Design notes (for discussion)

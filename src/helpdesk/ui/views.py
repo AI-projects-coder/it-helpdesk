@@ -12,14 +12,6 @@ KIND_COLORS = {
 }
 SERIES_1 = {"light": "#2a78d6", "dark": "#3987e5"}
 
-OUTCOME_BADGES = {
-    "resolved": ("✅", "Resolved"),
-    "action_completed": ("✅", "Action completed"),
-    "ticket_created": ("🎫", "Ticket created"),
-    "escalated": ("⚠️", "Escalated to a human"),
-}
-
-
 def span_kind(name: str) -> str:
     prefix = name.split(".", 1)[0]
     return {"helpdesk": "session", "agent": "agent", "llm": "llm", "tool": "tool"}.get(prefix, "agent")
@@ -72,25 +64,6 @@ def trace_stats(df: pd.DataFrame) -> dict:
         "tokens": int(df["tokens"].sum()),
         "errors": int((df["status"] == "ERROR").sum()),
     }
-
-
-def events_frame(state: dict) -> pd.DataFrame:
-    return pd.DataFrame(
-        [{"step": i + 1, "agent": e["agent"], "decision": e["decision"], "latency_ms": e["latency_ms"]}
-         for i, e in enumerate(state.get("events", []))]
-    )
-
-
-def tools_frame(state: dict) -> pd.DataFrame:
-    rows = []
-    for r in state.get("tool_results", []):
-        d = r.get("decision") or {}
-        rows.append({
-            "tool": r["tool"], "status": r["status"], "policy": d.get("effect", ""), "rule": d.get("rule_id", ""),
-            "attempts": r.get("attempts", 0), "latency_ms": r["latency_ms"],
-            "args": json.dumps(r["args"]), "output": json.dumps(r["output"]) if r["output"] else (r.get("error") or ""),
-        })
-    return pd.DataFrame(rows)
 
 
 def eval_tickets_frame(run: dict) -> pd.DataFrame:

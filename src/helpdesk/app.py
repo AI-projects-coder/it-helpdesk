@@ -132,7 +132,7 @@ class HelpdeskApp:
             raise ValueError(f"unknown conversation {conversation_id}")
         items = []
         for t in conv.turns:
-            if t.status != "completed" or t.customer_id != customer_id:
+            if t.status != "completed" or t.customer_id != customer_id or t.outcome == "out_of_scope":
                 continue
             try:
                 rec = self.store.load(t.session_id)  # already PII-redacted

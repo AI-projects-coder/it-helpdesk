@@ -17,6 +17,7 @@ T = TypeVar("T", bound=BaseModel)
 
 REQUEST_TIMEOUT_S = 30
 MAX_RETRIES = 2  # provider SDK retries transient errors with exponential backoff
+PARSE_ATTEMPTS = 2  # malformed structured output is re-asked once before failing the node
 
 
 class LLMOutputError(RuntimeError):
@@ -64,8 +65,12 @@ class LangChainLLM:
         with span(f"llm.{name}", llm_provider=self.provider, llm_model=self.model) as sp:
             kwargs = {"method": "function_calling"} if self.provider == "openai" else {}
             runnable = self._chat.with_structured_output(schema, include_raw=True, **kwargs)
-            out = runnable.invoke([SystemMessage(system), HumanMessage(user)])
-            if out.get("parsing_error") or out.get("parsed") is None:
+            for attempt in range(1, PARSE_ATTEMPTS + 1):
+                out = runnable.invoke([SystemMessage(system), HumanMessage(user)])
+                if not out.get("parsing_error") and out.get("parsed") is not None:
+                    break
+                sp.set_attribute("parse_failures", attempt)
+            else:
                 raise LLMOutputError(f"{name}: could not parse {schema.__name__}: {out.get('parsing_error')}")
             usage = getattr(out["raw"], "usage_metadata", None) or {}
             result = LLMResult(
